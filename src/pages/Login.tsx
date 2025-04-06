@@ -1,51 +1,73 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 
 const Login = () => {
-    const navigate = useNavigate();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        navigate("/home");
+        if (!email || !password) {
+            setError("Please fill in both fields.");
+        } else {
+            setError("");
+            console.log("Logging in with", email, password);
+        }
     };
 
     return (
-        <div
-            className="min-h-screen flex items-center justify-center bg-cover bg-center"
-            style={{ backgroundImage: "url('images/login.jpg')" }}
-        >
-            <div className="bg-white p-10 rounded-3xl shadow-xl w-full max-w-sm bg-opacity-80">
-                <h2 className="text-4xl font-bold text-center text-green-800 mb-8">Flavor Exchange</h2>
-                <form onSubmit={handleLogin} className="space-y-6">
-                    <div>
-                        <label className="block text-gray-700 font-medium">Email</label>
+        <div className="relative w-screen h-screen bg-gradient-to-r from-indigo-600 to-blue-500">
+            <div
+                className="absolute inset-0 w-full h-full bg-cover bg-center"
+                style={{
+                    backgroundImage: "url('/images/login.jpg')",
+                }}
+            ></div>
+            <div className="relative z-10 flex items-center justify-center h-full px-4">
+                <form
+                    onSubmit={handleSubmit}
+                    className="bg-white/70 backdrop-blur-xl text-gray-800 rounded-3xl shadow-lg p-10 w-full max-w-md space-y-8 transform transition-all ease-in-out duration-300"
+                >
+                    <h2 className="text-5xl font-extrabold text-center text-gray-900 tracking-tight">Welcome Back 👋</h2>
+                    <p className="text-center text-lg text-gray-600">
+                        Log in to share and explore tasty recipes 🍲
+                    </p>
+
+                    {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+
+                    <div className="space-y-4">
+                        <label className="block text-sm font-semibold text-gray-700">Email</label>
                         <input
                             type="email"
-                            required
-                            className="w-full mt-1 p-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-300"
+                            className="w-full p-4 rounded-lg bg-white/30 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 text-gray-900"
+                            placeholder="you@example.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
-                    <div>
-                        <label className="block text-gray-700 font-medium">Password</label>
+
+                    <div className="space-y-4">
+                        <label className="block text-sm font-semibold text-gray-700">Password</label>
                         <input
                             type="password"
-                            required
-                            className="w-full mt-1 p-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-300"
+                            className="w-full p-4 rounded-lg bg-white/30 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 text-gray-900"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
+
                     <button
                         type="submit"
-                        className="w-full py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-xl transition duration-300 hover:from-green-700 hover:to-green-800"
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-5 rounded-lg shadow-lg transform transition-all duration-300"
                     >
-                        Log In
+                        Login
                     </button>
+
+                    <p className="text-center text-sm text-gray-300">
+                        Don’t have an account? <a href="/signup" className="text-amber-400 hover:underline">Sign up</a>
+                    </p>
                 </form>
-                <p className="text-center text-gray-600 text-sm mt-6">
-                    Don't have an account?{" "}
-                    <a href="/signup" className="text-green-600 hover:underline font-medium">
-                        Sign up
-                    </a>
-                </p>
             </div>
         </div>
     );
