@@ -1,61 +1,51 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!email || !password) {
-            setError("Please fill in both fields.");
-        } else {
-            setError("");
-            console.log("Logging in with", email, password);
-        }
+        navigate("/home");
     };
 
     return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-                <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
-                {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                            Email
-                        </label>
+        <div
+            className="min-h-screen flex items-center justify-center bg-cover bg-center"
+            style={{ backgroundImage: "url('images/login.jpg')" }}
+        >
+            <div className="bg-white p-10 rounded-3xl shadow-xl w-full max-w-sm bg-opacity-80">
+                <h2 className="text-4xl font-bold text-center text-green-800 mb-8">Flavor Exchange</h2>
+                <form onSubmit={handleLogin} className="space-y-6">
+                    <div>
+                        <label className="block text-gray-700 font-medium">Email</label>
                         <input
                             type="email"
-                            id="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Enter your email"
-                            className="mt-2 p-3 border border-gray-300 rounded-md w-full"
                             required
+                            className="w-full mt-1 p-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-300"
                         />
                     </div>
-                    <div className="mb-6">
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                            Password
-                        </label>
+                    <div>
+                        <label className="block text-gray-700 font-medium">Password</label>
                         <input
                             type="password"
-                            id="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Enter your password"
-                            className="mt-2 p-3 border border-gray-300 rounded-md w-full"
                             required
+                            className="w-full mt-1 p-4 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition duration-300"
                         />
                     </div>
                     <button
                         type="submit"
-                        className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
+                        className="w-full py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-semibold rounded-xl transition duration-300 hover:from-green-700 hover:to-green-800"
                     >
-                        Login
+                        Log In
                     </button>
                 </form>
+                <p className="text-center text-gray-600 text-sm mt-6">
+                    Don't have an account?{" "}
+                    <a href="/signup" className="text-green-600 hover:underline font-medium">
+                        Sign up
+                    </a>
+                </p>
             </div>
         </div>
     );
