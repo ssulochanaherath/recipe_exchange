@@ -28,9 +28,9 @@ const Login = () => {
                     onSubmit={handleSubmit}
                     className="bg-white/70 backdrop-blur-xl text-gray-800 rounded-3xl shadow-lg p-10 w-full max-w-md space-y-8 transform transition-all ease-in-out duration-300"
                 >
-                    <h2 className="text-5xl font-extrabold text-center text-gray-900 tracking-tight">Welcome Back 👋</h2>
+                    <h2 className="text-5xl font-extrabold text-center text-gray-900 tracking-tight">Welcome Back</h2>
                     <p className="text-center text-lg text-gray-600">
-                        Log in to share and explore tasty recipes 🍲
+                        Log in to share and explore tasty recipes
                     </p>
 
                     {error && <p className="text-red-500 text-sm text-center">{error}</p>}
@@ -40,7 +40,7 @@ const Login = () => {
                         <input
                             type="email"
                             className="w-full p-4 rounded-lg bg-white/30 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 text-gray-900"
-                            placeholder="you@example.com"
+                            placeholder="Enter your email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
@@ -51,7 +51,7 @@ const Login = () => {
                         <input
                             type="password"
                             className="w-full p-4 rounded-lg bg-white/30 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-gray-400 text-gray-900"
-                            placeholder="••••••••"
+                            placeholder="Enter your password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
@@ -64,8 +64,8 @@ const Login = () => {
                         Login
                     </button>
 
-                    <p className="text-center text-sm text-gray-300">
-                        Don’t have an account? <a href="/signup" className="text-amber-400 hover:underline">Sign up</a>
+                    <p className="text-center text-sm text-black">
+                        Don’t have an account? <a href="/signup" className="text-indigo-800 hover:underline">Sign up</a>
                     </p>
                 </form>
             </div>
