@@ -33,8 +33,8 @@ const Navbar: React.FC = () => {
 
             <ul className="flex gap-4 sm:gap-6 items-center text-gray-800 dark:text-gray-200 font-medium text-sm sm:text-base">
                 <li>
-                    <Link to="/wall" className="hover:text-green-600 dark:hover:text-green-400 transition">
-                        Wall
+                    <Link to="/home" className="hover:text-green-600 dark:hover:text-green-400 transition">
+                        Home
                     </Link>
                 </li>
                 <li>
