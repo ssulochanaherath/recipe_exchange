@@ -14,8 +14,25 @@ const Signup = () => {
             return;
         }
 
-        const user = { name, email, password };
-        localStorage.setItem("user", JSON.stringify(user));
+        const newUser = { name, email, password };
+
+        // Retrieve existing users from localStorage or initialize an empty array
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        // Check if the email already exists
+        if (users.some(user => user.email === email)) {
+            setError("Email is already registered.");
+            return;
+        }
+
+        // Add the new user to the list
+        users.push(newUser);
+
+        // Save the updated users array back to localStorage
+        localStorage.setItem("users", JSON.stringify(users));
+
+        // Save the current user as the logged-in user
+        localStorage.setItem("loggedInUser", JSON.stringify(newUser));
 
         setError("");
         alert("Signup successful!");
@@ -23,9 +40,6 @@ const Signup = () => {
         setEmail("");
         setPassword("");
     };
-
-
-
 
     return (
         <div className="relative h-screen bg-gradient-to-r from-indigo-600 to-blue-500 overflow-auto">

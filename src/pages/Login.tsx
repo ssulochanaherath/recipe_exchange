@@ -1,55 +1,43 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        if (!email || !password) {
-            setError("Please fill in both fields.");
-            return;
-        }
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+        const user = users.find(u => u.email === email && u.password === password);
 
-        // Get the stored user data from localStorage
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-
-        if (!storedUser) {
-            setError("No account found. Please sign up first.");
-            return;
-        }
-
-        // Check if the entered email and password match the stored data
-        if (storedUser.email === email && storedUser.password === password) {
-            setError("");
-            console.log("Login successful with", email);
-            navigate("/home"); // Navigate to the home page if credentials are correct
-        } else {
+        if (!user) {
             setError("Invalid email or password.");
+            return;
         }
+
+        // Save the logged-in user to localStorage
+        localStorage.setItem("loggedInUser", JSON.stringify(user));
+
+        setError("");
+        alert("Login successful!");
+        window.location.href = "/home";  // Redirect to the Account page
     };
 
     return (
-        <div className="relative w-screen h-screen bg-gradient-to-r from-indigo-600 to-blue-500">
+        <div className="relative h-screen bg-gradient-to-r from-indigo-600 to-blue-500 overflow-auto">
             <div
-                className="absolute inset-0 w-full h-full bg-cover bg-center"
+                className="fixed inset-0 w-full h-full bg-cover bg-center"
                 style={{
                     backgroundImage: "url('/images/login.jpg')",
                 }}
             ></div>
-            <div className="relative z-10 flex items-center justify-center h-full px-4">
+            <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
                 <form
                     onSubmit={handleSubmit}
                     className="bg-white/70 backdrop-blur-xl text-gray-800 rounded-3xl shadow-lg p-10 w-full max-w-md space-y-8 transform transition-all ease-in-out duration-300"
                 >
-                    <h2 className="text-5xl font-extrabold text-center text-gray-900 tracking-tight">Welcome Back</h2>
-                    <p className="text-center text-lg text-gray-600">
-                        Log in to share and explore tasty recipes
-                    </p>
+                    <h2 className="text-4xl font-extrabold text-center text-gray-900 tracking-tight">Log In</h2>
 
                     {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
@@ -79,11 +67,11 @@ const Login = () => {
                         type="submit"
                         className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-5 rounded-lg shadow-lg transform transition-all duration-300"
                     >
-                        Login
+                        Log In
                     </button>
 
                     <p className="text-center text-sm text-black">
-                        Don’t have an account? <a href="/signup" className="text-indigo-800 hover:underline">Sign up</a>
+                        Don't have an account? <a href="/signup" className="text-indigo-800 hover:underline">Sign up</a>
                     </p>
                 </form>
             </div>

@@ -8,13 +8,15 @@ const Account = () => {
     const [userName, setUserName] = useState(""); // To store the user's name
 
     useEffect(() => {
-        // Retrieve the user data from localStorage
-        const storedUser = JSON.parse(localStorage.getItem("user"));
-        if (storedUser) {
-            setUserName(storedUser.name); // Set the user's name from localStorage
+        // Retrieve logged-in user data from localStorage
+        const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+        if (loggedInUser && loggedInUser.name) {
+            setUserName(loggedInUser.name); // Set the username from localStorage
+        } else {
+            setUserName("Guest");  // Default to "Guest" if no user data is found
         }
 
-        // Fetch user's recipes and saved recipes
+        // Fetch user's recipes and saved recipes (if applicable)
         fetch("http://localhost:3000/api/my-recipes")
             .then((res) => res.json())
             .then(setMyRecipes);
@@ -30,7 +32,7 @@ const Account = () => {
         const newRecipe = {
             image,
             description,
-            authorName: userName, // Use the user's name from state
+            authorName: userName,  // Use the user's name from state
         };
 
         fetch("http://localhost:3000/api/recipes", {
@@ -56,7 +58,9 @@ const Account = () => {
                     className="w-16 h-16 rounded-full object-cover"
                 />
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-800">{userName || "Current User"}</h1>
+                    <h1 className="text-2xl font-bold text-gray-800">
+                        {userName || "Current User"}
+                    </h1>
                     <p className="text-gray-500">Welcome to your recipe wall</p>
                 </div>
             </div>
@@ -86,56 +90,46 @@ const Account = () => {
                         />
                         <button
                             onClick={handlePost}
-                            className="mt-3 bg-indigo-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-indigo-700 transition"
+                            className="mt-3 bg-indigo-600 text-white px-6 py-2 rounded-lg"
                         >
-                            Post
+                            Post Recipe
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* My Posts Feed */}
-            <div className="max-w-4xl mx-auto mt-10 space-y-6">
-                <h2 className="text-xl font-semibold text-gray-700 mb-2">📝 My Recipes</h2>
-                {myRecipes.map((r) => (
-                    <div key={r.id} className="bg-white rounded-xl shadow-md overflow-hidden">
-                        <div className="flex items-center space-x-3 p-4">
+            {/* My Recipes */}
+            <div className="max-w-4xl mx-auto mt-6">
+                <h2 className="text-xl font-bold text-gray-800">My Recipes</h2>
+                <div className="space-y-4">
+                    {myRecipes.map((recipe) => (
+                        <div key={recipe._id} className="bg-white p-4 rounded-lg shadow-md">
                             <img
-                                src="https://i.pravatar.cc/100"
-                                alt="Avatar"
-                                className="w-10 h-10 rounded-full object-cover"
+                                src={recipe.image}
+                                alt={recipe.description}
+                                className="w-full h-40 object-cover rounded-lg"
                             />
-                            <div>
-                                <p className="font-semibold text-gray-800">{userName || "Current User"}</p>
-                                <p className="text-sm text-gray-500">Just now</p>
-                            </div>
+                            <p className="mt-2 text-gray-700">{recipe.description}</p>
                         </div>
-                        {r.image && <img src={r.image} alt="" className="w-full h-64 object-cover" />}
-                        <div className="p-4 text-gray-700">{r.description}</div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
 
-            {/* Saved Recipes Feed */}
-            <div className="max-w-4xl mx-auto mt-14 space-y-6">
-                <h2 className="text-xl font-semibold text-gray-700 mb-2">💾 Saved Recipes</h2>
-                {savedRecipes.map((r) => (
-                    <div key={r.id} className="bg-white rounded-xl shadow-md overflow-hidden">
-                        <div className="flex items-center space-x-3 p-4">
+            {/* Saved Recipes */}
+            <div className="max-w-4xl mx-auto mt-6">
+                <h2 className="text-xl font-bold text-gray-800">Saved Recipes</h2>
+                <div className="space-y-4">
+                    {savedRecipes.map((recipe) => (
+                        <div key={recipe._id} className="bg-white p-4 rounded-lg shadow-md">
                             <img
-                                src="https://i.pravatar.cc/100"
-                                alt="Avatar"
-                                className="w-10 h-10 rounded-full object-cover"
+                                src={recipe.image}
+                                alt={recipe.description}
+                                className="w-full h-40 object-cover rounded-lg"
                             />
-                            <div>
-                                <p className="font-semibold text-gray-800">{r.authorName || "User"}</p>
-                                <p className="text-sm text-gray-500">Saved</p>
-                            </div>
+                            <p className="mt-2 text-gray-700">{recipe.description}</p>
                         </div>
-                        {r.image && <img src={r.image} alt="" className="w-full h-64 object-cover" />}
-                        <div className="p-4 text-gray-700">{r.description}</div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
         </div>
     );
