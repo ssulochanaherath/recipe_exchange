@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -9,12 +9,27 @@ const Login = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
         if (!email || !password) {
             setError("Please fill in both fields.");
-        } else {
+            return;
+        }
+
+        // Get the stored user data from localStorage
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+
+        if (!storedUser) {
+            setError("No account found. Please sign up first.");
+            return;
+        }
+
+        // Check if the entered email and password match the stored data
+        if (storedUser.email === email && storedUser.password === password) {
             setError("");
-            console.log("Logging in with", email, password);
-            navigate("/home");
+            console.log("Login successful with", email);
+            navigate("/home"); // Navigate to the home page if credentials are correct
+        } else {
+            setError("Invalid email or password.");
         }
     };
 

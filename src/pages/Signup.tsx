@@ -8,13 +8,24 @@ const Signup = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
         if (!name || !email || !password) {
             setError("Please fill in all fields.");
-        } else {
-            setError("");
-            console.log("Signing up with", name, email, password);
+            return;
         }
+
+        const user = { name, email, password };
+        localStorage.setItem("user", JSON.stringify(user));
+
+        setError("");
+        alert("Signup successful!");
+        setName("");
+        setEmail("");
+        setPassword("");
     };
+
+
+
 
     return (
         <div className="relative h-screen bg-gradient-to-r from-indigo-600 to-blue-500 overflow-auto">
