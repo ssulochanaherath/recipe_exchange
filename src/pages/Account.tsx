@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setAccountDetails } from "../redux/slices/accountSlice";
 import Navbar from "../component/Navbar";
+import { addRecipe, setRecipes } from "../redux/slices/recipeSlice";
 
 // Get userId (or any unique identifier) from localStorage
 const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email; // or any unique identifier
@@ -11,6 +12,7 @@ const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email; // or an
 const Account = () => {
     const dispatch = useDispatch();
     const account = useSelector((state) => state.account);
+    const recipes = useSelector((state) => state.recipes);
 
     const [image, setImage] = useState(account.image || "https://i.pravatar.cc/100");
     const [userName, setUserName] = useState(account.name || "");
@@ -19,6 +21,13 @@ const Account = () => {
     const [age, setAge] = useState(account.age || "");
     const [isEditing, setIsEditing] = useState(false);
     const [file, setFile] = useState(null);
+
+    // Recipe state
+    const [recipeName, setRecipeName] = useState("");
+    const [recipeDescription, setRecipeDescription] = useState("");
+    const [recipeIngredients, setRecipeIngredients] = useState("");
+    const [recipeImage, setRecipeImage] = useState(null);
+    const [isRecipeEditing, setIsRecipeEditing] = useState(false);
 
     // Get the current userId from localStorage
     const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email; // Or any unique identifier
@@ -34,7 +43,13 @@ const Account = () => {
                 setImage(savedUser.image);
             }
         }
-    }, [userId]);
+
+        // Load saved recipes from localStorage
+        const savedRecipes = JSON.parse(localStorage.getItem(`recipes-${userId}`));
+        if (savedRecipes) {
+            dispatch(setRecipes(savedRecipes));
+        }
+    }, [userId, dispatch]);
 
     useEffect(() => {
         const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
@@ -80,6 +95,30 @@ const Account = () => {
 
         setIsEditing(false);
         alert("Profile updated successfully!");
+    }
+
+    // Handle recipe posting
+    const handlePostRecipe = () => {
+        const newRecipe = {
+            name: recipeName,
+            description: recipeDescription,
+            ingredients: recipeIngredients,
+            image: recipeImage || "https://via.placeholder.com/150", // Default image if none provided
+        };
+
+        dispatch(addRecipe(newRecipe));
+
+        // Save updated recipes to localStorage
+        const updatedRecipes = [...recipes, newRecipe];
+        localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes));
+
+        // Clear the form
+        setRecipeName("");
+        setRecipeDescription("");
+        setRecipeIngredients("");
+        setRecipeImage(null);
+        setIsRecipeEditing(false);
+        alert("Recipe posted successfully!");
     };
 
     return (
@@ -166,12 +205,96 @@ const Account = () => {
                             </div>
                         </div>
                     )}
+
+                    <div className="flex-1 max-w-4xl mx-auto">
+                        {/* Button to open recipe posting form */}
+                        {!isRecipeEditing && (
+                            <button
+                                onClick={() => setIsRecipeEditing(true)}
+                                className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg mb-6"
+                            >
+                                Post a Recipe
+                            </button>
+                        )}
+
+                        {/* Recipe Posting Section */}
+                        {isRecipeEditing && (
+                            <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+                                <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-4/5 md:w-1/3">
+                                    <div className="flex flex-col items-start space-y-6">
+                                        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Post a New Recipe</h2>
+                                        {/* Recipe Form */}
+                                        <input
+                                            type="text"
+                                            placeholder="Recipe Name"
+                                            value={recipeName}
+                                            onChange={(e) => setRecipeName(e.target.value)}
+                                            className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
+                                        />
+                                        <textarea
+                                            placeholder="Description"
+                                            value={recipeDescription}
+                                            onChange={(e) => setRecipeDescription(e.target.value)}
+                                            className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Ingredients (comma separated)"
+                                            value={recipeIngredients}
+                                            onChange={(e) => setRecipeIngredients(e.target.value)}
+                                            className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
+                                        />
+                                        <input
+                                            type="file"
+                                            onChange={(e) => setRecipeImage(URL.createObjectURL(e.target.files[0]))}
+                                            className="hidden"
+                                            id="recipe-image-upload"
+                                        />
+                                        <label htmlFor="recipe-image-upload" className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all text-sm">
+                                            📷 Upload Recipe Image
+                                        </label>
+
+                                        {recipeImage && (
+                                            <div className="mt-2">
+                                                <img src={recipeImage} alt="Recipe Preview" className="w-20 h-20 object-cover rounded-xl shadow-md" />
+                                            </div>
+                                        )}
+
+                                        <div className="flex space-x-4 mt-4">
+                                            <button onClick={handlePostRecipe} className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">
+                                                Post Recipe
+                                            </button>
+                                            <button onClick={() => setIsRecipeEditing(false)} className="bg-gray-400 text-white px-6 py-3 rounded-xl hover:bg-gray-500 transition-all shadow-md text-lg">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Show Recipes */}
+                        <div className="space-y-6 mt-8">
+                            <h3 className="text-xl text-gray-800 dark:text-white">Your Posted Recipes</h3>
+                            {recipes.length > 0 ? (
+                                recipes.map((recipe, index) => (
+                                    <div key={index} className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md">
+                                        <img src={recipe.image} alt="Recipe" className="w-20 h-20 object-cover rounded-xl shadow-md" />
+                                        <h4 className="font-bold text-gray-800 dark:text-white">{recipe.name}</h4>
+                                        <br/>
+                                        <p className="font-semibold text-gray-600 dark:text-gray-300">{recipe.description}</p>
+                                        <p className="text-gray-600 dark:text-gray-300">Ingredients: {recipe.ingredients}</p>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="text-gray-600 dark:text-gray-300">You haven't posted any recipes yet.</p>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
-
-
 
 export default Account;

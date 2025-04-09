@@ -1,18 +1,18 @@
-// src/redux/store.js
-
 import { configureStore } from '@reduxjs/toolkit';
 import accountReducer from './slices/accountSlice';
+import recipeReducer from './slices/recipeSlice';
 import { loadState, saveState } from './localStorage';
 
 // Assuming userId is fetched from the logged-in user's state or localStorage
 const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email; // Or use any unique identifier
 
 // Check if userId exists, if not, we won't load any state
-const persistedState = userId ? loadState(userId) : undefined;
+const persistedState = userId ? loadState(userId) : { account: {}, recipes: [] };
 
 const store = configureStore({
     reducer: {
         account: accountReducer,
+        recipes: recipeReducer,
     },
     preloadedState: persistedState, // Load the state for the current user
 });
@@ -21,7 +21,8 @@ const store = configureStore({
 store.subscribe(() => {
     if (userId) {
         saveState({
-            account: store.getState().account, // Only save the 'account' state
+            account: store.getState().account, // Save the 'account' state
+            recipes: store.getState().recipes, // Save the 'recipes' state
         }, userId); // Save state for the specific user
     }
 });
