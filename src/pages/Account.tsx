@@ -36,6 +36,14 @@ const Account = () => {
         }
     }, [userId]);
 
+    useEffect(() => {
+        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+        if (loggedInUser) {
+            setUserName(loggedInUser.name);
+        }
+    }, []);
+
+
     const handleImageUpload = (event) => {
         const uploadedFile = event.target.files[0];
         if (uploadedFile) {
@@ -85,14 +93,15 @@ const Account = () => {
                             <img
                                 src={image}
                                 alt="Avatar"
-                                className="w-64 h-64 rounded-2xl object-cover shadow-lg cursor-pointer hover:scale-105 transition-transform"
+                                className="w-64 h-78 rounded-2xl object-cover shadow-lg cursor-pointer hover:scale-105 transition-transform"
                                 onClick={() => setIsEditing(true)}
                             />
                         </div>
 
                         {/* Left-align the rest */}
                         <div className="flex flex-col items-start text-left space-y-1">
-                            <h2 className="text-2xl font-semibold text-gray-800 dark:text-white">{userName}</h2>
+                            <h2 className="text-2xl font-didot text-gray-800 dark:text-white">{userName}</h2>
+                            <br/>
                             <p className="text-md text-gray-600 dark:text-gray-300">💼 <span className="font-medium">{career}</span></p>
                             <p className="text-md text-gray-600 dark:text-gray-300">📍 <span className="font-medium">{location}</span></p>
                             <p className="text-md text-gray-600 dark:text-gray-300">🎂 <span className="font-medium">{age}</span></p>

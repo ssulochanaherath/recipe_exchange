@@ -12,42 +12,37 @@ const Signup = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Check if all fields are filled
         if (!name || !email || !password) {
             setErrorState("Please fill in all fields.");
             return;
         }
 
-        // Create a new user object
         const newUser = { name, email, password };
 
-        // Retrieve users from localStorage
         const users = JSON.parse(localStorage.getItem("users")) || [];
 
-        // Check if the email already exists in the users array
         if (users.some((user) => user.email === email)) {
             setErrorState("Email is already registered.");
             return;
         }
 
-        // Add new user to the users array
         users.push(newUser);
-
-        // Save the updated users array to localStorage
         localStorage.setItem("users", JSON.stringify(users));
 
-        // Dispatch the setUser action to store the user in Redux and localStorage
+        // Save user data in localStorage under a unique key
+        localStorage.setItem('loggedInUser', JSON.stringify({ email, name }));
+
+        // Dispatch the user data to Redux store
         dispatch(setUser(newUser));
 
-        // Clear error state and show success message
         setErrorState("");
         alert("Signup successful!");
 
-        // Clear form fields after successful signup
         setName("");
         setEmail("");
         setPassword("");
     };
+
 
     return (
         <div className="relative h-screen bg-gradient-to-r from-indigo-600 to-blue-500 overflow-auto">
