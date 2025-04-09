@@ -1,41 +1,49 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/slices/authSlice";
 
 const Signup = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+    const [error, setErrorState] = useState(""); // Define the error state
+    const dispatch = useDispatch();
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        // Check if all fields are filled
         if (!name || !email || !password) {
-            setError("Please fill in all fields.");
+            setErrorState("Please fill in all fields.");
             return;
         }
 
+        // Create a new user object
         const newUser = { name, email, password };
 
-        // Retrieve existing users from localStorage or initialize an empty array
+        // Retrieve users from localStorage
         const users = JSON.parse(localStorage.getItem("users")) || [];
 
-        // Check if the email already exists
-        if (users.some(user => user.email === email)) {
-            setError("Email is already registered.");
+        // Check if the email already exists in the users array
+        if (users.some((user) => user.email === email)) {
+            setErrorState("Email is already registered.");
             return;
         }
 
-        // Add the new user to the list
+        // Add new user to the users array
         users.push(newUser);
 
-        // Save the updated users array back to localStorage
+        // Save the updated users array to localStorage
         localStorage.setItem("users", JSON.stringify(users));
 
-        // Save the current user as the logged-in user
-        localStorage.setItem("loggedInUser", JSON.stringify(newUser));
+        // Dispatch the setUser action to store the user in Redux and localStorage
+        dispatch(setUser(newUser));
 
-        setError("");
+        // Clear error state and show success message
+        setErrorState("");
         alert("Signup successful!");
+
+        // Clear form fields after successful signup
         setName("");
         setEmail("");
         setPassword("");
@@ -56,6 +64,7 @@ const Signup = () => {
                 >
                     <h2 className="text-4xl font-extrabold text-center text-gray-900 tracking-tight">Create Account</h2>
 
+                    {/* Display error message if any */}
                     {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
                     <div className="space-y-4">
@@ -99,7 +108,7 @@ const Signup = () => {
                     </button>
 
                     <p className="text-center text-sm text-black">
-                        Already have an account? <a href="/" className="text-indigo-800 hover:underline">Log in</a>
+                        Already have an account? <a href="/login" className="text-indigo-800 hover:underline">Log in</a>
                     </p>
                 </form>
             </div>

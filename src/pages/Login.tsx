@@ -1,16 +1,25 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate hook for navigation
+import { useDispatch } from "react-redux"; // Import useDispatch to use Redux
+import { setUser } from "../redux/slices/authSlice"; // Adjust the import path based on your project structure
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+    const [error, setError] = useState("");  // Error state for invalid login
+    const dispatch = useDispatch();  // To dispatch actions to Redux store
+    const navigate = useNavigate();  // Initialize useNavigate
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
+        // Retrieve users from localStorage
         const users = JSON.parse(localStorage.getItem("users")) || [];
+
+        // Find the user matching the entered email and password
         const user = users.find(u => u.email === email && u.password === password);
 
+        // If no matching user found, show error
         if (!user) {
             setError("Invalid email or password.");
             return;
@@ -19,9 +28,17 @@ const Login = () => {
         // Save the logged-in user to localStorage
         localStorage.setItem("loggedInUser", JSON.stringify(user));
 
-        setError("");
+        // Dispatch the setUser action to store the user in Redux (optional if using Redux for user state)
+        dispatch(setUser(user));
+
+        // Clear form fields after successful login
+        setEmail("");
+        setPassword("");
+        setError(""); // Clear any existing error
+
+        // Redirect to the user's account or home page
         alert("Login successful!");
-        window.location.href = "/home";  // Redirect to the Account page
+        navigate("/account");  // Redirect to the account page (adjust if needed)
     };
 
     return (
@@ -39,6 +56,7 @@ const Login = () => {
                 >
                     <h2 className="text-4xl font-extrabold text-center text-gray-900 tracking-tight">Log In</h2>
 
+                    {/* Show error message if any */}
                     {error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
                     <div className="space-y-4">

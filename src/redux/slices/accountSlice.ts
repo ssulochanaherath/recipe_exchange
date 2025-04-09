@@ -1,35 +1,33 @@
-import { createSlice } from '@reduxjs/toolkit';
+// src/redux/slices/accountSlice.js
 
-interface AccountState {
-    name: string;
-    career: string;
-    location: string;
-    age: string;
-    image: string;
-}
+import { createSlice } from "@reduxjs/toolkit";
 
-const initialState: AccountState = {
-    name: '',
-    career: '',
-    location: '',
-    age: '',
-    image: 'https://i.pravatar.cc/100', // Default image
+// Get data from localStorage if available
+const loadProfileFromLocalStorage = () => {
+    const profile = localStorage.getItem("userProfile");
+    return profile ? JSON.parse(profile) : null;
 };
 
+const initialState = loadProfileFromLocalStorage() || {
+    name: "",
+    career: "",
+    location: "",
+    age: "",
+    image: "https://i.pravatar.cc/100", // Default image
+};
+
+// Create slice
 const accountSlice = createSlice({
-    name: 'account',
+    name: "account",
     initialState,
     reducers: {
         setAccountDetails: (state, action) => {
-            state.name = action.payload.name;
-            state.career = action.payload.career;
-            state.location = action.payload.location;
-            state.age = action.payload.age;
-            state.image = action.payload.image;
+            // Update state with new details
+            const updatedProfile = action.payload;
+            return { ...state, ...updatedProfile };
         },
-        clearAccountDetails: () => initialState, // Optional: to clear account data
     },
 });
 
-export const { setAccountDetails, clearAccountDetails } = accountSlice.actions;
+export const { setAccountDetails } = accountSlice.actions;
 export default accountSlice.reducer;

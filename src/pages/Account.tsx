@@ -1,29 +1,40 @@
+// Account.js (or Account.tsx)
+
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setAccountDetails } from "../redux/slices/accountSlice";
 import Navbar from "../component/Navbar";
 
+// Get userId (or any unique identifier) from localStorage
+const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email; // or any unique identifier
+
 const Account = () => {
     const dispatch = useDispatch();
     const account = useSelector((state) => state.account);
 
-    const [image, setImage] = useState(account.image);
-    const [userName, setUserName] = useState(account.name);
-    const [career, setCareer] = useState(account.career);
-    const [location, setLocation] = useState(account.location);
-    const [age, setAge] = useState(account.age);
+    const [image, setImage] = useState(account.image || "https://i.pravatar.cc/100");
+    const [userName, setUserName] = useState(account.name || "");
+    const [career, setCareer] = useState(account.career || "");
+    const [location, setLocation] = useState(account.location || "");
+    const [age, setAge] = useState(account.age || "");
     const [isEditing, setIsEditing] = useState(false);
     const [file, setFile] = useState(null);
 
+    // Get the current userId from localStorage
+    const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email; // Or any unique identifier
+
     useEffect(() => {
-        if (account) {
-            setUserName(account.name);
-            setCareer(account.career || "");
-            setLocation(account.location || "");
-            setAge(account.age || "");
-            setImage(account.image || "https://i.pravatar.cc/100");
+        if (userId) {
+            const savedUser = JSON.parse(localStorage.getItem(`flavor-exchange-state-${userId}`));
+            if (savedUser) {
+                setUserName(savedUser.name);
+                setCareer(savedUser.career);
+                setLocation(savedUser.location);
+                setAge(savedUser.age);
+                setImage(savedUser.image);
+            }
         }
-    }, [account]);
+    }, [userId]);
 
     const handleImageUpload = (event) => {
         const uploadedFile = event.target.files[0];
@@ -31,9 +42,16 @@ const Account = () => {
             setFile(uploadedFile);
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImage(reader.result); // Set the base64 string
+                setImage(reader.result); // Set the base64 string for image
             };
             reader.readAsDataURL(uploadedFile);
+        }
+    };
+
+    const saveState = (updatedUser) => {
+        // Ensure we're saving the profile with the correct key (userId)
+        if (userId) {
+            localStorage.setItem(`flavor-exchange-state-${userId}`, JSON.stringify(updatedUser));
         }
     };
 
@@ -43,11 +61,14 @@ const Account = () => {
             career,
             location,
             age,
-            image: file ? image : "https://i.pravatar.cc/100",
+            image: file ? image : "https://i.pravatar.cc/100", // Default image if none provided
         };
 
-        // Dispatch action to update Redux store and localStorage
+        // Dispatch action to update Redux store (if you're using it for state management)
         dispatch(setAccountDetails(updatedUser));
+
+        // Save updated user profile to localStorage with unique key (userId)
+        saveState(updatedUser);
 
         setIsEditing(false);
         alert("Profile updated successfully!");
@@ -125,5 +146,7 @@ const Account = () => {
         </div>
     );
 };
+
+
 
 export default Account;
