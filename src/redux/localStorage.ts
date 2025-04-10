@@ -1,14 +1,14 @@
-export const loadState = (userId) => {
+// Function to load global recipes (not tied to userId)
+export const loadState = () => {
     try {
-        const serializedState = localStorage.getItem(userId);
+        const serializedState = localStorage.getItem('allRecipes'); // Load the global recipes under the key 'allRecipes'
         if (!serializedState) return undefined;
 
         const parsedState = JSON.parse(serializedState);
 
         // Ensure recipes is always an array, even if it's missing or malformed
         return {
-            ...parsedState,
-            recipes: Array.isArray(parsedState.recipes) ? parsedState.recipes : [],
+            recipes: Array.isArray(parsedState.recipes) ? parsedState.recipes : [],  // Return recipes only
         };
     } catch (err) {
         console.error('Could not load state from localStorage', err);
@@ -16,13 +16,14 @@ export const loadState = (userId) => {
     }
 };
 
-export const saveState = (state, userId) => {
+// Function to save global recipes (not tied to userId)
+export const saveState = (state) => {
     try {
         const serializedState = JSON.stringify(state);
 
         // Always make sure the state has valid data before saving
-        if (state && userId) {
-            localStorage.setItem(userId, serializedState);
+        if (state) {
+            localStorage.setItem('allRecipes', serializedState);  // Save global recipes under the key 'allRecipes'
         } else {
             console.warn("Attempted to save invalid state", state);
         }

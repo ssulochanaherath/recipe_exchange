@@ -1,22 +1,32 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { loadRecipes } from '../redux/slices/recipeSlice';  // Adjust the path accordingly
-import { loadState } from '../redux/localStorage';
-import Navbar from "../component/Navbar.tsx";  // Adjust the path accordingly
+import { loadRecipes } from '../redux/slices/recipeSlice';
+import Navbar from "../component/Navbar.tsx";
+import RecipeForm from '../component/RecipeForm';
 
 const HomePage = () => {
     const dispatch = useDispatch();
-    const recipes = useSelector((state) => state.recipes);
+    const recipes = useSelector((state: any) => state.recipes);
 
     useEffect(() => {
-        // Get the userId from your state, for example from the logged-in user
-        const userId = 'yourUserId';  // You can replace this with dynamic userId
-        const storedState = loadState(userId);
+        const allRecipes = [];
 
-        if (storedState && storedState.recipes) {
-            // Dispatch the action to set the recipes in Redux
-            dispatch(loadRecipes(storedState.recipes));
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+
+            if (key && key.startsWith("recipes-")) {
+                try {
+                    const storedRecipes = JSON.parse(localStorage.getItem(key));
+                    if (Array.isArray(storedRecipes)) {
+                        allRecipes.push(...storedRecipes);
+                    }
+                } catch (err) {
+                    console.error(`Error loading recipes from ${key}:`, err);
+                }
+            }
         }
+
+        dispatch(loadRecipes(allRecipes));
     }, [dispatch]);
 
     return (
@@ -28,11 +38,9 @@ const HomePage = () => {
                 {recipes.length === 0 ? (
                     <p>No recipes found.</p>
                 ) : (
-                    recipes.map((recipe) => (
-                        <div key={recipe.id} className="p-4">
-
-                            <img src={recipe.image} alt={recipe.name} className="w-full h-48 object-cover mt-2" />
-                            <h3 className="text-xl font-semibold">{recipe.name}</h3>
+                    recipes.map((recipe: any, index: number) => (
+                        <div key={index}> {/* Unique key warning resolved */}
+                            <RecipeForm recipe={recipe} />
                         </div>
                     ))
                 )}
