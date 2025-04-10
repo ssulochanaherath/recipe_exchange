@@ -13,6 +13,7 @@ const HomePage = () => {
 
     const [selectedRecipe, setSelectedRecipe] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         const allRecipes = [];
@@ -54,15 +55,31 @@ const HomePage = () => {
         }
     };
 
+    // Filter recipes based on the search query
+    const filteredRecipes = recipes.filter((recipe: any) =>
+        recipe.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <div>
             <Navbar />
-            <h1 className="text-center text-3xl font-bold my-4">Recipe Wall</h1>
+            <div className="flex justify-between items-center px-4 py-2">
+                <h1 className="text-center text-2xl font-bold">Recipe Wall</h1>
+                {/* Search Bar */}
+                <input
+                    type="text"
+                    placeholder="Search recipes..."
+                    className="p-2 border rounded-lg w-64"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+            </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
-                {recipes.length === 0 ? (
+                {filteredRecipes.length === 0 ? (
                     <p>No recipes found.</p>
                 ) : (
-                    recipes.map((recipe: any) => {
+                    filteredRecipes.map((recipe: any) => {
                         const isFavorite = favorites.some((fav: any) => fav.id === recipe.id);
 
                         return (
