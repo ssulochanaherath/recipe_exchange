@@ -15,7 +15,7 @@ const RecipeForm = ({ recipe }: { recipe: any }) => {
                 className="w-full h-64 object-cover rounded-t-lg"
             />
             <div className="p-4 flex justify-between items-center">
-                <h3 className="text-2xl font-semibold text-gray-800">{recipe.name}</h3>
+                <h3 className="text-xl font-semi text-gray-800">{recipe.name}</h3>
                 <button
                     onClick={handleFavoriteToggle}
                     className="w-8 h-8 flex items-center justify-center border-transparent hover:border-gray-600 rounded-full transition-colors duration-200 focus:outline-none"
