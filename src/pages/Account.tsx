@@ -1,18 +1,14 @@
-// Account.js (or Account.tsx)
-
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setAccountDetails } from "../redux/slices/accountSlice";
 import Navbar from "../component/Navbar";
-import { addRecipe, setRecipes } from "../redux/slices/recipeSlice";
-
-// Get userId (or any unique identifier) from localStorage
-const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email; // or any unique identifier
+import { addRecipe, setPostedRecipes } from "../redux/slices/recipeSlice";
+import { RootState } from '../redux/store.ts'; // adjust path based on your setup
 
 const Account = () => {
     const dispatch = useDispatch();
     const account = useSelector((state) => state.account);
-    const recipes = useSelector((state) => state.recipes);
+    const recipes = useSelector((state:RootState) => state.recipes);
 
     const [image, setImage] = useState(account.image || "https://i.pravatar.cc/100");
     const [userName, setUserName] = useState(account.name || "");
@@ -34,30 +30,32 @@ const Account = () => {
 
     useEffect(() => {
         if (userId) {
-            const savedUser = JSON.parse(localStorage.getItem(`flavor-exchange-state-${userId}`));
-            if (savedUser) {
-                setUserName(savedUser.name);
-                setCareer(savedUser.career);
-                setLocation(savedUser.location);
-                setAge(savedUser.age);
-                setImage(savedUser.image);
+            // Load profile data from localStorage
+            try {
+                const savedUser = JSON.parse(localStorage.getItem(`flavor-exchange-state-${userId}`));
+                if (savedUser) {
+                    setUserName(savedUser.name || "");
+                    setCareer(savedUser.career || "");
+                    setLocation(savedUser.location || "");
+                    setAge(savedUser.age || "");
+                    setImage(savedUser.image || "https://i.pravatar.cc/100");
+                    dispatch(setAccountDetails(savedUser));
+                }
+            } catch (error) {
+                console.error("Error loading user profile from localStorage:", error);
+            }
+
+            // Load recipes from localStorage
+            try {
+                const savedRecipes = JSON.parse(localStorage.getItem(`recipes-${userId}`));
+                if (savedRecipes) {
+                    dispatch(setPostedRecipes(savedRecipes));
+                }
+            } catch (error) {
+                console.error("Error loading recipes from localStorage:", error);
             }
         }
-
-        // Load saved recipes from localStorage
-        const savedRecipes = JSON.parse(localStorage.getItem(`recipes-${userId}`));
-        if (savedRecipes) {
-            dispatch(setRecipes(savedRecipes));
-        }
-    }, [userId, dispatch]);
-
-    useEffect(() => {
-        const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-        if (loggedInUser) {
-            setUserName(loggedInUser.name);
-        }
-    }, []);
-
+    }, [userId]);
 
     const handleImageUpload = (event) => {
         const uploadedFile = event.target.files[0];
@@ -84,7 +82,7 @@ const Account = () => {
             career,
             location,
             age,
-            image: file ? image : "https://i.pravatar.cc/100", // Default image if none provided
+            image,
         };
 
         // Dispatch action to update Redux store (if you're using it for state management)
@@ -95,21 +93,20 @@ const Account = () => {
 
         setIsEditing(false);
         alert("Profile updated successfully!");
-    }
+    };
 
     // Handle recipe posting
     const handlePostRecipe = () => {
         const newRecipe = {
             name: recipeName,
             description: recipeDescription,
-            ingredients: recipeIngredients,
+            ingredients: recipeIngredients.split(',').map(i => i.trim()), // Converts to array
             image: recipeImage || "https://via.placeholder.com/150", // Default image if none provided
         };
 
-        dispatch(addRecipe(newRecipe));
-
         // Save updated recipes to localStorage
         const updatedRecipes = [...recipes, newRecipe];
+        dispatch(addRecipe(newRecipe));
         localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes));
 
         // Clear the form
@@ -119,6 +116,9 @@ const Account = () => {
         setRecipeImage(null);
         setIsRecipeEditing(false);
         alert("Recipe posted successfully!");
+
+        // Optionally: Update the local recipes state to reflect changes immediately
+        dispatch(setPostedRecipes(updatedRecipes));
     };
 
     return (
@@ -275,20 +275,22 @@ const Account = () => {
 
                         {/* Show Recipes */}
                         <div className="space-y-6 mt-8">
-                            <h3 className="text-xl text-gray-800 dark:text-white">Your Posted Recipes</h3>
-                            {recipes.length > 0 ? (
-                                recipes.map((recipe, index) => (
-                                    <div key={index} className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md">
-                                        <img src={recipe.image} alt="Recipe" className="w-20 h-20 object-cover rounded-xl shadow-md" />
-                                        <h4 className="font-bold text-gray-800 dark:text-white">{recipe.name}</h4>
-                                        <br/>
-                                        <p className="font-semibold text-gray-600 dark:text-gray-300">{recipe.description}</p>
-                                        <p className="text-gray-600 dark:text-gray-300">Ingredients: {recipe.ingredients}</p>
+                            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mt-8 mb-4">Posted Recipes</h2>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                                {recipes.map((recipe, index) => (
+                                    <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
+                                        <img src={recipe.image} alt={recipe.name} className="w-full h-40 object-cover rounded-md mb-3" />
+                                        <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{recipe.name}</h3>
+                                        <p className="text-sm text-gray-600 dark:text-gray-300">{recipe.description}</p>
+                                        <ul className="list-disc list-inside mt-2 text-gray-700 dark:text-gray-300">
+                                            {Array.isArray(recipe.ingredients)
+                                                ? recipe.ingredients.map((ingredient, i) => <li key={i}>{ingredient}</li>)
+                                                : recipe.ingredients.split(',').map((ingredient, i) => <li key={i}>{ingredient.trim()}</li>)
+                                            }
+                                        </ul>
                                     </div>
-                                ))
-                            ) : (
-                                <p className="text-gray-600 dark:text-gray-300">You haven't posted any recipes yet.</p>
-                            )}
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>
