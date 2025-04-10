@@ -60,6 +60,16 @@ const Account = () => {
         }
     }, [userId]);
 
+    const handleAddRecipe = () => {
+        // Reset the form and set modal to "Add Recipe" mode
+        setIsEditing(false);
+        setRecipeName('');
+        setRecipeDescription('');
+        setRecipeIngredients('');
+        setRecipeImage(null);
+        setIsRecipeEditing(true); // Open modal for adding new recipe
+    };
+
     const handleImageUpload = (event) => {
         const uploadedFile = event.target.files[0];
         if (uploadedFile) {
@@ -146,12 +156,13 @@ const Account = () => {
         setRecipeDescription(recipe.description);
         setRecipeIngredients(recipe.ingredients.join(", "));
         setRecipeImage(recipe.image); // Pre-fill the image if available
-        setIsRecipeEditing(true); // Show the edit form
+        setIsEditing(true); // Set to "Edit Recipe" mode
+        setIsRecipeEditing(true); // Open modal
     };
 
     const handleSaveRecipe = () => {
-        if (recipeToEdit) {
-            // Update the existing recipe
+        if (isEditing) {
+            // Edit existing recipe
             const updatedRecipe = {
                 ...recipeToEdit,
                 name: recipeName,
@@ -164,22 +175,32 @@ const Account = () => {
                 r === recipeToEdit ? updatedRecipe : r // Replace the old recipe with the updated one
             );
 
-            // Dispatch action to update Redux store (if you're using it for state management)
             dispatch(setPostedRecipes(updatedRecipes));
 
-            // Save updated recipes to localStorage
             localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes));
+        } else {
+            // Add new recipe
+            const newRecipe = {
+                id: Date.now(),
+                name: recipeName,
+                description: recipeDescription,
+                ingredients: recipeIngredients.split(',').map(i => i.trim()),
+                image: recipeImage || "https://via.placeholder.com/150",
+            };
 
-            // Reset the form and state
-            setRecipeToEdit(null); // Clear the recipe to edit
-            setRecipeName("");
-            setRecipeDescription("");
-            setRecipeIngredients("");
-            setRecipeImage(null);
-            setIsRecipeEditing(false); // Hide the edit form
-
-            alert("Recipe updated successfully!");
+            const updatedRecipes = [...recipes, newRecipe];
+            dispatch(setPostedRecipes(updatedRecipes));
+            localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes));
         }
+
+        // Reset form and close modal
+        setRecipeToEdit(null);
+        setRecipeName("");
+        setRecipeDescription("");
+        setRecipeIngredients("");
+        setRecipeImage(null);
+        setIsRecipeEditing(false);
+        alert(isEditing ? "Recipe updated successfully!" : "Recipe added successfully!");
     };
 
     // Function to remove a recipe by index
@@ -220,54 +241,54 @@ const Account = () => {
                 </div>
 
                 <div className="flex-1 max-w-4xl mx-auto">
-                    {isEditing && (
+                    {isRecipeEditing && (
                         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
                             <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-4/5 md:w-1/3">
                                 <div className="flex flex-col items-start space-y-6">
-                                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Edit Your Profile</h2>
-                                    <div className="flex items-center space-x-4">
-                                        <input
-                                            type="file"
-                                            onChange={handleImageUpload}
-                                            className="hidden"
-                                            id="image-upload"
-                                        />
-                                        <label htmlFor="image-upload" className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all text-sm">
-                                            📷 Upload Image
-                                        </label>
-                                        {image && (
-                                            <div className="mt-2">
-                                                <img src={image} alt="Profile Preview" className="w-20 h-20 object-cover rounded-xl shadow-md" />
-                                            </div>
-                                        )}
-                                    </div>
+                                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+                                        {isEditing ? "Edit Recipe" : "Add Recipe"}
+                                    </h2>
+                                    <input
+                                        type="text"
+                                        placeholder="Recipe Name"
+                                        value={recipeName}
+                                        onChange={(e) => setRecipeName(e.target.value)}
+                                        className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
+                                    />
+                                    <textarea
+                                        placeholder="Description"
+                                        value={recipeDescription}
+                                        onChange={(e) => setRecipeDescription(e.target.value)}
+                                        className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Ingredients (comma separated)"
+                                        value={recipeIngredients}
+                                        onChange={(e) => setRecipeIngredients(e.target.value)}
+                                        className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
+                                    />
+                                    <input
+                                        type="file"
+                                        onChange={handleRecipeImageUpload}
+                                        className="hidden"
+                                        id="recipe-image-upload"
+                                    />
+                                    <label htmlFor="recipe-image-upload" className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all text-sm">
+                                        📷 Upload Recipe Image
+                                    </label>
 
-                                    <input
-                                        type="text"
-                                        placeholder="Career"
-                                        value={career}
-                                        onChange={(e) => setCareer(e.target.value)}
-                                        className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="Location"
-                                        value={location}
-                                        onChange={(e) => setLocation(e.target.value)}
-                                        className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
-                                    />
-                                    <input
-                                        type="number"
-                                        placeholder="Age"
-                                        value={age}
-                                        onChange={(e) => setAge(e.target.value)}
-                                        className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
-                                    />
+                                    {recipeImage && (
+                                        <div className="mt-2">
+                                            <img src={recipeImage} alt="Recipe Preview" className="w-20 h-20 object-cover rounded-xl shadow-md" />
+                                        </div>
+                                    )}
+
                                     <div className="flex space-x-4 mt-4">
-                                        <button onClick={handleSaveDetails} className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">
-                                            Save Changes
+                                        <button onClick={handleSaveRecipe} className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">
+                                            {isEditing ? "Save Changes" : "Post Recipe"}
                                         </button>
-                                        <button onClick={() => setIsEditing(false)} className="bg-gray-400 text-white px-6 py-3 rounded-xl hover:bg-gray-500 transition-all shadow-md text-lg">
+                                        <button onClick={() => setIsRecipeEditing(false)} className="bg-gray-400 text-white px-6 py-3 rounded-xl hover:bg-gray-500 transition-all shadow-md text-lg">
                                             Cancel
                                         </button>
                                     </div>
@@ -275,6 +296,7 @@ const Account = () => {
                             </div>
                         </div>
                     )}
+
 
                     <div className="flex-1 max-w-4xl mx-auto">
                         {/* Button to open recipe posting form */}
