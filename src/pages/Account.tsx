@@ -57,22 +57,30 @@ const Account = () => {
         }
     }, [userId]);
 
+
     const handleImageUpload = (event) => {
         const uploadedFile = event.target.files[0];
         if (uploadedFile) {
-            setFile(uploadedFile);
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImage(reader.result); // Set the base64 string for image
+                const imageUrl = reader.result as string; // Base64 string for the image
+                setImage(imageUrl); // Save the base64 image URL to state for the profile image
+
+                // Save the image to localStorage along with other user details
+                saveState({ ...account, image: imageUrl });
             };
-            reader.readAsDataURL(uploadedFile);
+            reader.readAsDataURL(uploadedFile); // Read the file as base64
         }
     };
 
-    const saveState = (updatedUser) => {
-        // Ensure we're saving the profile with the correct key (userId)
-        if (userId) {
-            localStorage.setItem(`flavor-exchange-state-${userId}`, JSON.stringify(updatedUser));
+    const handleRecipeImageUpload = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setRecipeImage(reader.result as string); // Store base64 image string
+            };
+            reader.readAsDataURL(file); // Convert the image to base64
         }
     };
 
@@ -95,6 +103,13 @@ const Account = () => {
         alert("Profile updated successfully!");
     };
 
+    const saveState = (updatedUser) => {
+        // Ensure we're saving the profile with the correct key (userId)
+        if (userId) {
+            localStorage.setItem(`flavor-exchange-state-${userId}`, JSON.stringify(updatedUser));
+        }
+    };
+
     // Handle recipe posting
     const handlePostRecipe = () => {
         const newRecipe = {
@@ -106,10 +121,10 @@ const Account = () => {
 
         // Save updated recipes to localStorage
         const updatedRecipes = [...recipes, newRecipe];
-        dispatch(addRecipe(newRecipe));
-        localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes));
+        dispatch(addRecipe(newRecipe)); // Redux action to add the recipe
+        localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes)); // Save to localStorage
 
-        // Clear the form
+        // Clear the form and reset state
         setRecipeName("");
         setRecipeDescription("");
         setRecipeIngredients("");
@@ -255,7 +270,7 @@ const Account = () => {
                                         />
                                         <input
                                             type="file"
-                                            onChange={(e) => setRecipeImage(URL.createObjectURL(e.target.files[0]))}
+                                            onChange={handleRecipeImageUpload}
                                             className="hidden"
                                             id="recipe-image-upload"
                                         />
@@ -285,10 +300,14 @@ const Account = () => {
                         {/* Show Recipes */}
                         <div className="space-y-6 mt-8">
                             <h2 className="text-2xl font-bold text-gray-800 dark:text-white mt-8 mb-4">Posted Recipes</h2>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+
+                            {/* Make the container flex-col so it stacks vertically */}
+                            <div className="flex flex-col space-y-6">
                                 {recipes.map((recipe, index) => (
                                     <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
-                                        <img src={recipe.image} alt={recipe.name} className="w-full h-40 object-cover rounded-md mb-3" />
+                                        {recipe.image && (
+                                            <img src={recipe.image} alt={recipe.name} className="w-full h-60 object-cover rounded-md mb-3" />
+                                        )}
                                         <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{recipe.name}</h3>
                                         <p className="text-sm text-gray-600 dark:text-gray-300">{recipe.description}</p>
                                         <ul className="list-disc list-inside mt-2 text-gray-700 dark:text-gray-300">
@@ -297,7 +316,12 @@ const Account = () => {
                                                 : recipe.ingredients.split(',').map((ingredient, i) => <li key={i}>{ingredient.trim()}</li>)
                                             }
                                         </ul>
-                                        <button onClick={() => handleRemoveRecipe(index)}>Remove</button>
+                                        <button
+                                            onClick={() => handleRemoveRecipe(index)}
+                                            className="mt-3 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                        >
+                                            Remove
+                                        </button>
                                     </div>
                                 ))}
                             </div>
