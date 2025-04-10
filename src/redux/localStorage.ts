@@ -5,9 +5,9 @@ export const loadState = (userId) => {
 
         const parsedState = JSON.parse(serializedState);
 
+        // Ensure recipes is always an array, even if it's missing or malformed
         return {
             ...parsedState,
-            // Ensure recipes is always an array
             recipes: Array.isArray(parsedState.recipes) ? parsedState.recipes : [],
         };
     } catch (err) {
@@ -19,7 +19,13 @@ export const loadState = (userId) => {
 export const saveState = (state, userId) => {
     try {
         const serializedState = JSON.stringify(state);
-        localStorage.setItem(userId, serializedState);
+
+        // Always make sure the state has valid data before saving
+        if (state && userId) {
+            localStorage.setItem(userId, serializedState);
+        } else {
+            console.warn("Attempted to save invalid state", state);
+        }
     } catch (err) {
         console.error('Could not save state to localStorage', err);
     }

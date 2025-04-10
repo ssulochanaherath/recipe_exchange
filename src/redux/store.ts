@@ -6,7 +6,7 @@ import { loadState, saveState } from './localStorage';
 // Assuming userId is fetched from the logged-in user's state or localStorage
 const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email; // Or use any unique identifier
 
-// Check if userId exists, if not, we won't load any state
+// Only load persisted state if userId is valid
 const persistedState = userId ? loadState(userId) : { account: {}, recipes: [] };
 
 const store = configureStore({
@@ -14,7 +14,7 @@ const store = configureStore({
         account: accountReducer,
         recipes: recipeReducer,
     },
-    preloadedState: persistedState, // Load the state for the current user
+    preloadedState: persistedState, // Load the state for the current user if userId exists
 });
 
 // Save state to localStorage whenever it changes, but store it under the user's unique ID

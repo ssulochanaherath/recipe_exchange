@@ -1,27 +1,20 @@
+// recipeSlice.ts
 import { createSlice } from '@reduxjs/toolkit';
 
-// Initial state for the recipe slice
-const initialState = [];
+const initialState = {}; // Store recipes per userId/email
 
-// Recipe slice to manage posted recipes
 const recipeSlice = createSlice({
     name: 'recipes',
-    initialState,
+    initialState: [],
     reducers: {
-        setPostedRecipes: (state, action) => {
-            return action.payload; // Set the posted recipes to the payload
-        },
         addRecipe: (state, action) => {
-            state.push(action.payload); // Add a new recipe to the list
+            state.push(action.payload);
         },
-        removeRecipe: (state, action) => {
-            return state.filter((recipe) => recipe.id !== action.payload); // Remove recipe by id
-        },
-    },
+        setPostedRecipes: (state, action) => {
+            return action.payload;
+        }
+    }
 });
 
-// Export the actions
 export const { setPostedRecipes, addRecipe, removeRecipe } = recipeSlice.actions;
-
-// Export the reducer
 export default recipeSlice.reducer;

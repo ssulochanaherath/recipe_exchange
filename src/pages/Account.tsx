@@ -121,6 +121,15 @@ const Account = () => {
         dispatch(setPostedRecipes(updatedRecipes));
     };
 
+    // Function to remove a recipe by index
+    const handleRemoveRecipe = (index) => {
+        const updatedRecipes = recipes.filter((_, i) => i !== index);
+
+        dispatch(setPostedRecipes(updatedRecipes));
+        localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes));
+    };
+
+
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
             <Navbar />
@@ -288,6 +297,7 @@ const Account = () => {
                                                 : recipe.ingredients.split(',').map((ingredient, i) => <li key={i}>{ingredient.trim()}</li>)
                                             }
                                         </ul>
+                                        <button onClick={() => handleRemoveRecipe(index)}>Remove</button>
                                     </div>
                                 ))}
                             </div>
