@@ -2,20 +2,28 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const favoritesSlice = createSlice({
     name: 'favorites',
-    initialState: [],
+    initialState: {
+        favorites: [],
+    },
     reducers: {
         addFavorite: (state, action) => {
-            const recipe = action.payload;
-            if (!state.some((fav) => fav.id === recipe.id)) {
-                state.push(recipe);
+            const { id, name, description, ingredients } = action.payload; // no image or huge fields
+            const exists = state.favorites.some(fav => fav.id === id);
+            if (!exists) {
+                state.favorites.push({ id, name, description, ingredients });
             }
         },
+
         removeFavorite: (state, action) => {
-            const recipe = action.payload;
-            return state.filter((fav) => fav.id !== recipe.id);
+            state.favorites = state.favorites.filter(fav => fav.id !== action.payload.id);
         },
+
+        loadFavorites: (state, action) => {
+            state.favorites = action.payload || [];
+        }
+
     },
 });
 
-export const { addFavorite, removeFavorite } = favoritesSlice.actions;
+export const { addFavorite, removeFavorite, loadFavorites } = favoritesSlice.actions;
 export default favoritesSlice.reducer;

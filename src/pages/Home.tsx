@@ -14,6 +14,7 @@ const HomePage = () => {
     const [selectedRecipe, setSelectedRecipe] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    // Load recipes and favorites on initial render
     useEffect(() => {
         const allRecipes = [];
         for (let i = 0; i < localStorage.length; i++) {
@@ -29,11 +30,24 @@ const HomePage = () => {
                 }
             }
         }
+
         dispatch(loadRecipes(allRecipes));
 
-        // Load favorites from localStorage only once
-        dispatch(loadFavorites());
+        const savedFavorites = localStorage.getItem("favorites");
+        if (savedFavorites) {
+            try {
+                const parsedFavorites = JSON.parse(savedFavorites);
+                dispatch(loadFavorites(parsedFavorites));
+            } catch (err) {
+                console.error("Error parsing favorites from localStorage:", err);
+            }
+        }
     }, [dispatch]);
+
+    // Save favorites to localStorage whenever they change
+    useEffect(() => {
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+    }, [favorites]);
 
     const openRecipePopup = (recipe: any) => {
         setSelectedRecipe(recipe);

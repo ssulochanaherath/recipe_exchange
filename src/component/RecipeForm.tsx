@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { addFavorite, removeFavorite } from '../redux/slices/favoritesSlice';
 
-const RecipeForm = ({ recipe, isFavorite }: { recipe: any, isFavorite: boolean }) => {
+const RecipeForm = ({ recipe, isFavorite, onFavoriteToggle }: { recipe: any, isFavorite: boolean }) => {
     const dispatch = useDispatch();
 
     const handleFavoriteToggle = (e: React.MouseEvent) => {
@@ -24,7 +24,10 @@ const RecipeForm = ({ recipe, isFavorite }: { recipe: any, isFavorite: boolean }
             <div className="p-4 flex justify-between items-center">
                 <h3 className="text-xl font-semi text-gray-800">{recipe.name}</h3>
                 <button
-                    onClick={handleFavoriteToggle}
+                    onClick={(e) =>{
+                        e.stopPropagation();
+                        onFavoriteToggle();
+                    }}
                     className="w-8 h-8 flex items-center justify-center border-transparent hover:border-gray-600 rounded-full transition-colors duration-200 focus:outline-none"
                 >
                     <svg
