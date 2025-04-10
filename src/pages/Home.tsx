@@ -61,15 +61,15 @@ const HomePage = () => {
     );
 
     return (
-        <div>
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-200">
             <Navbar />
             <div className="flex justify-between items-center px-4 py-2">
-                <h1 className="text-center text-2xl font-bold">Recipe Wall</h1>
+                <h1 className="text-center text-2xl font-bold text-gray-900 dark:text-gray-200">Recipe Wall</h1>
                 {/* Search Bar */}
                 <input
                     type="text"
                     placeholder="Search recipes..."
-                    className="p-2 border rounded-lg w-64"
+                    className="p-2 border rounded-lg w-64 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -77,7 +77,7 @@ const HomePage = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
                 {filteredRecipes.length === 0 ? (
-                    <p>No recipes found.</p>
+                    <p className="text-center text-gray-600 dark:text-gray-400">No recipes found.</p>
                 ) : (
                     filteredRecipes.map((recipe: any) => {
                         const isFavorite = favorites.some((fav: any) => fav.id === recipe.id);
@@ -86,7 +86,7 @@ const HomePage = () => {
                             <div
                                 key={recipe.id}
                                 onClick={() => openRecipePopup(recipe)}
-                                className="cursor-pointer"
+                                className="cursor-pointer bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow"
                             >
                                 <RecipeForm
                                     recipe={recipe}

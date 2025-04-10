@@ -30,7 +30,7 @@ const Login = () => {
         setError("");
 
         alert("Login successful!");
-        navigate("/account");
+        navigate("/home");
     };
 
     return (
