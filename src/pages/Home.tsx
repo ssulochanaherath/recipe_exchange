@@ -1,63 +1,42 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../component/Navbar";
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { loadRecipes } from '../redux/slices/recipeSlice';  // Adjust the path accordingly
+import { loadState } from '../redux/localStorage';
+import Navbar from "../component/Navbar.tsx";  // Adjust the path accordingly
 
-const Home = () => {
-    const [recipes, setRecipes] = useState([]);
-    const navigate = useNavigate();
+const HomePage = () => {
+    const dispatch = useDispatch();
+    const recipes = useSelector((state) => state.recipes);
 
     useEffect(() => {
-        fetch("http://localhost:3000/api/recipes")
-            .then((res) => res.json())
-            .then((data) => setRecipes(data))
-            .catch((err) => console.error("Error fetching recipes:", err));
-    }, []);
+        // Get the userId from your state, for example from the logged-in user
+        const userId = 'yourUserId';  // You can replace this with dynamic userId
+        const storedState = loadState(userId);
 
-    const handleFavorite = (id: string | number) => {
-        console.log("Favorited recipe ID:", id);
-    };
+        if (storedState && storedState.recipes) {
+            // Dispatch the action to set the recipes in Redux
+            dispatch(loadRecipes(storedState.recipes));
+        }
+    }, [dispatch]);
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-950 transition-colors duration-300">
+        <div>
             <Navbar />
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-
+            <h1 className="text-center text-3xl font-bold my-4">Recipe Wall</h1>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
                 {recipes.length === 0 ? (
-                    <p className="text-gray-600 dark:text-gray-400">No recipes found.</p>
+                    <p>No recipes found.</p>
                 ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {recipes.map((recipe) => (
-                            <div
-                                key={recipe.id}
-                                className="bg-white dark:bg-gray-800 rounded-2xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
-                            >
-                                <img
-                                    src={recipe.image}
-                                    alt="Recipe"
-                                    className="w-full h-52 object-cover"
-                                />
-                                <div className="p-4 space-y-2">
-                                    <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-                                        {recipe.description}
-                                    </h2>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                                        Posted by: {recipe.authorName}
-                                    </p>
-                                    <button
-                                        onClick={() => handleFavorite(recipe.id)}
-                                        className="bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-full transition"
-                                    >
-                                        ❤️ Favorite
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                    recipes.map((recipe) => (
+                        <div key={recipe.id} className="bg-white rounded-lg shadow-md p-4">
+                            <h3 className="text-xl font-semibold">{recipe.name}</h3>
+                            <img src={recipe.image} alt={recipe.name} className="w-full h-48 object-cover rounded-md mt-2" />
+                        </div>
+                    ))
                 )}
             </div>
         </div>
     );
 };
 
-export default Home;
+export default HomePage;

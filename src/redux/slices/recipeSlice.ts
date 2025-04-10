@@ -12,9 +12,15 @@ const recipeSlice = createSlice({
         },
         setPostedRecipes: (state, action) => {
             return action.payload;
-        }
+        },
+        removeRecipe: (state, action) => {
+            return state.filter((recipe) => recipe.id !== action.payload.id);
+        },
+        loadRecipes: (state, action) => {
+            return action.payload;
+        },
     }
 });
 
-export const { setPostedRecipes, addRecipe, removeRecipe } = recipeSlice.actions;
+export const { setPostedRecipes, addRecipe, removeRecipe,loadRecipes } = recipeSlice.actions;
 export default recipeSlice.reducer;
