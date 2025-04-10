@@ -26,7 +26,7 @@ const Navbar: React.FC = () => {
     };
 
     return (
-        <nav className="w-full flex justify-between items-center px-6 py-4 bg-white dark:bg-gray-900 shadow-lg sticky top-0 z-50 transition-colors duration-300">
+        <nav className="w-full flex justify-between items-center px-6 py-4 bg-white dark:bg-gray-900 sticky top-0 z-50 transition-colors duration-300">
             <div className="text-2xl font-extrabold tracking-tight text-green-800 dark:text-green-300">
                 <Link to="/" className="hover:opacity-90 transition">Flavor Exchange</Link>
             </div>
