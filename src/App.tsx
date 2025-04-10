@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import Account from "./pages/Account.tsx";
+import Favorites from "./pages/Favorite";
 
 function App() {
     return (
@@ -16,6 +17,7 @@ function App() {
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/home" element={<Home />} />
                     <Route path="/account" element={<Account />} />
+                    <Route path="/favorites" element={<Favorites />} />
                 </Routes>
         </Provider>
     );

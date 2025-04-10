@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setAccountDetails } from "../redux/slices/accountSlice";
 import Navbar from "../component/Navbar";
 import { addRecipe, setPostedRecipes } from "../redux/slices/recipeSlice";
-import { RootState } from '../redux/store.ts'; // adjust path based on your setup
+import { RootState } from '../redux/store.ts';
 
 const Account = () => {
     const dispatch = useDispatch();
@@ -18,19 +18,16 @@ const Account = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [file, setFile] = useState(null);
 
-    // Recipe state
     const [recipeName, setRecipeName] = useState("");
     const [recipeDescription, setRecipeDescription] = useState("");
     const [recipeIngredients, setRecipeIngredients] = useState("");
     const [recipeImage, setRecipeImage] = useState(null);
     const [isRecipeEditing, setIsRecipeEditing] = useState(false);
 
-    // Get the current userId from localStorage
     const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email; // Or any unique identifier
 
     useEffect(() => {
         if (userId) {
-            // Load profile data from localStorage
             try {
                 const savedUser = JSON.parse(localStorage.getItem(`flavor-exchange-state-${userId}`));
                 if (savedUser) {
@@ -45,7 +42,6 @@ const Account = () => {
                 console.error("Error loading user profile from localStorage:", error);
             }
 
-            // Load recipes from localStorage
             try {
                 const savedRecipes = JSON.parse(localStorage.getItem(`recipes-${userId}`));
                 if (savedRecipes) {
@@ -63,14 +59,13 @@ const Account = () => {
             setFile(uploadedFile);
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImage(reader.result); // Set the base64 string for image
+                setImage(reader.result);
             };
             reader.readAsDataURL(uploadedFile);
         }
     };
 
     const saveState = (updatedUser) => {
-        // Ensure we're saving the profile with the correct key (userId)
         if (userId) {
             localStorage.setItem(`flavor-exchange-state-${userId}`, JSON.stringify(updatedUser));
         }
@@ -85,10 +80,7 @@ const Account = () => {
             image,
         };
 
-        // Dispatch action to update Redux store (if you're using it for state management)
         dispatch(setAccountDetails(updatedUser));
-
-        // Save updated user profile to localStorage with unique key (userId)
         saveState(updatedUser);
 
         setIsEditing(false);
@@ -104,12 +96,10 @@ const Account = () => {
             image: recipeImage || "https://via.placeholder.com/150", // Default image if none provided
         };
 
-        // Save updated recipes to localStorage
         const updatedRecipes = [...recipes, newRecipe];
         dispatch(addRecipe(newRecipe));
         localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes));
 
-        // Clear the form
         setRecipeName("");
         setRecipeDescription("");
         setRecipeIngredients("");
@@ -121,7 +111,6 @@ const Account = () => {
         dispatch(setPostedRecipes(updatedRecipes));
     };
 
-    // Function to remove a recipe by index
     const handleRemoveRecipe = (index) => {
         const updatedRecipes = recipes.filter((_, i) => i !== index);
 

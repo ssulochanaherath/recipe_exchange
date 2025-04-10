@@ -1,29 +1,25 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// Set the initial state as an empty array
-const initialState = [];  // Store recipes globally, not tied to a userId/email
+const initialState = [];
 
 const recipeSlice = createSlice({
     name: 'recipes',
     initialState,
     reducers: {
         addRecipe: (state, action) => {
-            state.push(action.payload);  // Add a new recipe
+            state.push(action.payload);
         },
         setPostedRecipes: (state, action) => {
-            return action.payload;  // Set the state with a list of recipes (useful for setting posted recipes)
+            return action.payload;
         },
         removeRecipe: (state, action) => {
-            return state.filter((recipe) => recipe.id !== action.payload.id);  // Remove a recipe by its ID
+            return state.filter((recipe) => recipe.id !== action.payload.id);
         },
         loadRecipes: (state, action) => {
-            return action.payload;  // Load all recipes into the state (useful for populating all recipes)
+            return action.payload;
         },
     }
 });
 
-// Export the actions for dispatching
 export const { setPostedRecipes, addRecipe, removeRecipe, loadRecipes } = recipeSlice.actions;
-
-// Export the reducer as default for configuring the Redux store
 export default recipeSlice.reducer;

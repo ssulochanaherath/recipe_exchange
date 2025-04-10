@@ -1,5 +1,3 @@
-// src/redux/slices/accountSlice.js
-
 import { createSlice } from "@reduxjs/toolkit";
 
 // Get data from localStorage if available
@@ -16,7 +14,6 @@ const initialState = loadProfileFromLocalStorage() || {
     image: "https://i.pravatar.cc/100", // Default image
 };
 
-// Create slice
 const accountSlice = createSlice({
     name: "account",
     initialState,

@@ -1,44 +1,36 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate hook for navigation
-import { useDispatch } from "react-redux"; // Import useDispatch to use Redux
-import { setUser } from "../redux/slices/authSlice"; // Adjust the import path based on your project structure
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/slices/authSlice";
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");  // Error state for invalid login
-    const dispatch = useDispatch();  // To dispatch actions to Redux store
-    const navigate = useNavigate();  // Initialize useNavigate
+    const [error, setError] = useState("");
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Retrieve users from localStorage
         const users = JSON.parse(localStorage.getItem("users")) || [];
 
-        // Find the user matching the entered email and password
         const user = users.find(u => u.email === email && u.password === password);
 
-        // If no matching user found, show error
         if (!user) {
             setError("Invalid email or password.");
             return;
         }
 
-        // Save the logged-in user to localStorage
         localStorage.setItem("loggedInUser", JSON.stringify(user));
-
-        // Dispatch the setUser action to store the user in Redux (optional if using Redux for user state)
         dispatch(setUser(user));
 
-        // Clear form fields after successful login
         setEmail("");
         setPassword("");
-        setError(""); // Clear any existing error
+        setError("");
 
-        // Redirect to the user's account or home page
         alert("Login successful!");
-        navigate("/account");  // Redirect to the account page (adjust if needed)
+        navigate("/account");
     };
 
     return (

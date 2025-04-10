@@ -1,10 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { addFavorite, removeFavorite } from '../redux/slices/favoritesSlice';
 
-const RecipeForm = ({ recipe }: { recipe: any }) => {
-    const [isFavorite, setIsFavorite] = useState(false);
+const RecipeForm = ({ recipe, isFavorite }: { recipe: any, isFavorite: boolean }) => {
+    const dispatch = useDispatch();
 
-    const handleFavoriteToggle = () => {
-        setIsFavorite((prev) => !prev);
+    const handleFavoriteToggle = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!isFavorite) {
+            dispatch(addFavorite(recipe));
+        } else {
+            dispatch(removeFavorite(recipe));
+        }
     };
 
     return (
@@ -22,7 +29,7 @@ const RecipeForm = ({ recipe }: { recipe: any }) => {
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        fill={isFavorite ? 'black' : 'none'} // Only the heart is filled in black
+                        fill={isFavorite ? 'black' : 'none'}
                         stroke="black"
                         strokeWidth="2"
                         viewBox="0 0 24 24"

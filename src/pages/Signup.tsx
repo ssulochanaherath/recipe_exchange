@@ -6,7 +6,7 @@ const Signup = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setErrorState] = useState(""); // Define the error state
+    const [error, setErrorState] = useState("");
     const dispatch = useDispatch();
 
     const handleSubmit = (e) => {
@@ -29,10 +29,8 @@ const Signup = () => {
         users.push(newUser);
         localStorage.setItem("users", JSON.stringify(users));
 
-        // Save user data in localStorage under a unique key
         localStorage.setItem('loggedInUser', JSON.stringify({ email, name }));
 
-        // Dispatch the user data to Redux store
         dispatch(setUser(newUser));
 
         setErrorState("");
