@@ -19,7 +19,7 @@ const RecipeForm = ({ recipe, isFavorite, onFavoriteToggle }: { recipe: any, isF
             <img
                 src={recipe.image}
                 alt={recipe.name}
-                className="w-full h-64 object-cover rounded-t-lg"
+                className="w-full h-64 object-cover rounded"
             />
             <div className="p-4 flex justify-between items-center">
                 <h3 className="text-xl font-semi text-gray-800">{recipe.name}</h3>

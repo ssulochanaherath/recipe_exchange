@@ -1,10 +1,19 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, {useEffect} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import RecipeForm from '../component/RecipeForm';
 import Navbar from "../component/Navbar.tsx";
+import {loadFavorites} from "../redux/slices/favoritesSlice.ts";
 
 const FavoritePage = () => {
     const favorites = useSelector((state: any) => state.favorites.favorites);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        const storedFavorites = JSON.parse(localStorage.getItem('favorites'));
+        if (storedFavorites) {
+            dispatch(loadFavorites(storedFavorites));
+        }
+    }, [dispatch]);
 
     return (
         <div>
