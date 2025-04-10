@@ -8,7 +8,7 @@ import { RootState } from '../redux/store.ts'; // adjust path based on your setu
 const Account = () => {
     const dispatch = useDispatch();
     const account = useSelector((state) => state.account);
-    const recipes = useSelector((state:RootState) => state.recipes);
+    const recipes = useSelector((state: RootState) => state.recipes);
 
     const [image, setImage] = useState(account.image || "https://i.pravatar.cc/100");
     const [userName, setUserName] = useState(account.name || "");
@@ -18,12 +18,15 @@ const Account = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [file, setFile] = useState(null);
 
-    // Recipe state
+    // Recipe state for editing
     const [recipeName, setRecipeName] = useState("");
     const [recipeDescription, setRecipeDescription] = useState("");
     const [recipeIngredients, setRecipeIngredients] = useState("");
     const [recipeImage, setRecipeImage] = useState(null);
     const [isRecipeEditing, setIsRecipeEditing] = useState(false);
+    const [editingIndex, setEditingIndex] = useState(null);
+
+    const [recipeToEdit, setRecipeToEdit] = useState(null);
 
     // Get the current userId from localStorage
     const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email; // Or any unique identifier
@@ -56,7 +59,6 @@ const Account = () => {
             }
         }
     }, [userId]);
-
 
     const handleImageUpload = (event) => {
         const uploadedFile = event.target.files[0];
@@ -134,6 +136,50 @@ const Account = () => {
 
         // Optionally: Update the local recipes state to reflect changes immediately
         dispatch(setPostedRecipes(updatedRecipes));
+    };
+
+    // Handle edit for recipes
+    const handleEditRecipe = (index) => {
+        const recipe = recipes[index];
+        setRecipeToEdit(recipe); // Set the recipe to edit
+        setRecipeName(recipe.name);
+        setRecipeDescription(recipe.description);
+        setRecipeIngredients(recipe.ingredients.join(", "));
+        setRecipeImage(recipe.image); // Pre-fill the image if available
+        setIsRecipeEditing(true); // Show the edit form
+    };
+
+    const handleSaveRecipe = () => {
+        if (recipeToEdit) {
+            // Update the existing recipe
+            const updatedRecipe = {
+                ...recipeToEdit,
+                name: recipeName,
+                description: recipeDescription,
+                ingredients: recipeIngredients.split(',').map(i => i.trim()), // Converts to array
+                image: recipeImage || "https://via.placeholder.com/150", // Default image if none provided
+            };
+
+            const updatedRecipes = recipes.map((r) =>
+                r === recipeToEdit ? updatedRecipe : r // Replace the old recipe with the updated one
+            );
+
+            // Dispatch action to update Redux store (if you're using it for state management)
+            dispatch(setPostedRecipes(updatedRecipes));
+
+            // Save updated recipes to localStorage
+            localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes));
+
+            // Reset the form and state
+            setRecipeToEdit(null); // Clear the recipe to edit
+            setRecipeName("");
+            setRecipeDescription("");
+            setRecipeIngredients("");
+            setRecipeImage(null);
+            setIsRecipeEditing(false); // Hide the edit form
+
+            alert("Recipe updated successfully!");
+        }
     };
 
     // Function to remove a recipe by index
@@ -246,7 +292,7 @@ const Account = () => {
                             <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
                                 <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-4/5 md:w-1/3">
                                     <div className="flex flex-col items-start space-y-6">
-                                        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Post a New Recipe</h2>
+                                        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Edit Recipe</h2>
                                         {/* Recipe Form */}
                                         <input
                                             type="text"
@@ -285,8 +331,8 @@ const Account = () => {
                                         )}
 
                                         <div className="flex space-x-4 mt-4">
-                                            <button onClick={handlePostRecipe} className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">
-                                                Post Recipe
+                                            <button onClick={handleSaveRecipe} className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">
+                                                Save Changes
                                             </button>
                                             <button onClick={() => setIsRecipeEditing(false)} className="bg-gray-400 text-white px-6 py-3 rounded-xl hover:bg-gray-500 transition-all shadow-md text-lg">
                                                 Cancel
@@ -316,6 +362,12 @@ const Account = () => {
                                                 : recipe.ingredients.split(',').map((ingredient, i) => <li key={i}>{ingredient.trim()}</li>)
                                             }
                                         </ul>
+                                        <button
+                                            onClick={() => handleEditRecipe(index)}
+                                            className="mt-3 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
+                                        >
+                                            Edit
+                                        </button>
                                         <button
                                             onClick={() => handleRemoveRecipe(index)}
                                             className="mt-3 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
