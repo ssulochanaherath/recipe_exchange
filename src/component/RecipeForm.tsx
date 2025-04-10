@@ -18,7 +18,7 @@ const RecipeForm = ({ recipe }: { recipe: any }) => {
                 <h3 className="text-2xl font-semibold text-gray-800">{recipe.name}</h3>
                 <button
                     onClick={handleFavoriteToggle}
-                    className="w-8 h-8 flex items-center justify-center border-2 border-transparent hover:border-gray-600 rounded-full transition-colors duration-200 focus:outline-none"
+                    className="w-8 h-8 flex items-center justify-center border-transparent hover:border-gray-600 rounded-full transition-colors duration-200 focus:outline-none"
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
