@@ -156,6 +156,7 @@ const Account = () => {
         setRecipeDescription(recipe.description);
         setRecipeIngredients(recipe.ingredients.join(", "));
         setRecipeImage(recipe.image); // Pre-fill the image if available
+        setEditingIndex(index); // ✅ set the editing index
         setIsEditing(true); // Set to "Edit Recipe" mode
         setIsRecipeEditing(true); // Open modal
     };
@@ -231,23 +232,32 @@ const Account = () => {
                         {/* Left-align the rest */}
                         <div className="flex flex-col items-start text-left space-y-1">
                             <h2 className="text-2xl font-didot text-gray-800 dark:text-white">{userName}</h2>
-                            <br/>
+                            <br />
                             <p className="text-md text-gray-600 dark:text-gray-300">💼 <span className="font-medium">{career}</span></p>
                             <p className="text-md text-gray-600 dark:text-gray-300">📍 <span className="font-medium">{location}</span></p>
                             <p className="text-md text-gray-600 dark:text-gray-300">🎂 <span className="font-medium">{age}</span></p>
                         </div>
                     </div>
-
                 </div>
 
                 <div className="flex-1 max-w-4xl mx-auto">
-                    {isRecipeEditing && (
+                    {/* Button to open recipe posting form */}
+                    {!isRecipeEditing && (
+                        <button
+                            onClick={() => setIsRecipeEditing(true)} // This will open the form for posting a new recipe
+                            className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg mb-6"
+                        >
+                            Post a Recipe
+                        </button>
+                    )}
+
+                    {/* Recipe Posting Form */}
+                    {isRecipeEditing && !isEditing && (
                         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
                             <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-4/5 md:w-1/3">
                                 <div className="flex flex-col items-start space-y-6">
-                                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-                                        {isEditing ? "Edit Recipe" : "Add Recipe"}
-                                    </h2>
+                                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Add Recipe</h2>
+                                    {/* Post Recipe Form */}
                                     <input
                                         type="text"
                                         placeholder="Recipe Name"
@@ -285,10 +295,24 @@ const Account = () => {
                                     )}
 
                                     <div className="flex space-x-4 mt-4">
-                                        <button onClick={handleSaveRecipe} className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">
-                                            {isEditing ? "Save Changes" : "Post Recipe"}
+                                        <button
+                                            onClick={handlePostRecipe} // Post new recipe for adding mode
+                                            className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg"
+                                        >
+                                            Post Recipe
                                         </button>
-                                        <button onClick={() => setIsRecipeEditing(false)} className="bg-gray-400 text-white px-6 py-3 rounded-xl hover:bg-gray-500 transition-all shadow-md text-lg">
+
+                                        <button
+                                            onClick={() => {
+                                                setIsRecipeEditing(false); // Close the modal
+                                                // Clear input fields when canceling
+                                                setRecipeName('');
+                                                setRecipeDescription('');
+                                                setRecipeIngredients('');
+                                                setRecipeImage(null);
+                                            }}
+                                            className="bg-gray-400 text-white px-6 py-3 rounded-xl hover:bg-gray-500 transition-all shadow-md text-lg"
+                                        >
                                             Cancel
                                         </button>
                                     </div>
@@ -297,108 +321,107 @@ const Account = () => {
                         </div>
                     )}
 
+                    {/* Recipe Edit Form */}
+                    {isRecipeEditing && isEditing && (
+                        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+                            <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-4/5 md:w-1/3">
+                                <div className="flex flex-col items-start space-y-6">
+                                    <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Edit Recipe</h2>
+                                    {/* Edit Recipe Form */}
+                                    <input
+                                        type="text"
+                                        placeholder="Recipe Name"
+                                        value={recipeName}
+                                        onChange={(e) => setRecipeName(e.target.value)}
+                                        className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
+                                    />
+                                    <textarea
+                                        placeholder="Description"
+                                        value={recipeDescription}
+                                        onChange={(e) => setRecipeDescription(e.target.value)}
+                                        className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Ingredients (comma separated)"
+                                        value={recipeIngredients}
+                                        onChange={(e) => setRecipeIngredients(e.target.value)}
+                                        className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
+                                    />
+                                    <input
+                                        type="file"
+                                        onChange={handleRecipeImageUpload}
+                                        className="hidden"
+                                        id="recipe-image-upload"
+                                    />
+                                    <label htmlFor="recipe-image-upload" className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all text-sm">
+                                        📷 Upload Recipe Image
+                                    </label>
 
-                    <div className="flex-1 max-w-4xl mx-auto">
-                        {/* Button to open recipe posting form */}
-                        {!isRecipeEditing && (
-                            <button
-                                onClick={() => setIsRecipeEditing(true)}
-                                className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg mb-6"
-                            >
-                                Post a Recipe
-                            </button>
-                        )}
-
-                        {/* Recipe Posting Section */}
-                        {isRecipeEditing && (
-                            <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
-                                <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-2xl w-4/5 md:w-1/3">
-                                    <div className="flex flex-col items-start space-y-6">
-                                        <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Edit Recipe</h2>
-                                        {/* Recipe Form */}
-                                        <input
-                                            type="text"
-                                            placeholder="Recipe Name"
-                                            value={recipeName}
-                                            onChange={(e) => setRecipeName(e.target.value)}
-                                            className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
-                                        />
-                                        <textarea
-                                            placeholder="Description"
-                                            value={recipeDescription}
-                                            onChange={(e) => setRecipeDescription(e.target.value)}
-                                            className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
-                                        />
-                                        <input
-                                            type="text"
-                                            placeholder="Ingredients (comma separated)"
-                                            value={recipeIngredients}
-                                            onChange={(e) => setRecipeIngredients(e.target.value)}
-                                            className="w-full p-4 text-lg rounded-xl border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm dark:bg-gray-700"
-                                        />
-                                        <input
-                                            type="file"
-                                            onChange={handleRecipeImageUpload}
-                                            className="hidden"
-                                            id="recipe-image-upload"
-                                        />
-                                        <label htmlFor="recipe-image-upload" className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all text-sm">
-                                            📷 Upload Recipe Image
-                                        </label>
-
-                                        {recipeImage && (
-                                            <div className="mt-2">
-                                                <img src={recipeImage} alt="Recipe Preview" className="w-20 h-20 object-cover rounded-xl shadow-md" />
-                                            </div>
-                                        )}
-
-                                        <div className="flex space-x-4 mt-4">
-                                            <button onClick={handleSaveRecipe} className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">
-                                                Save Changes
-                                            </button>
-                                            <button onClick={() => setIsRecipeEditing(false)} className="bg-gray-400 text-white px-6 py-3 rounded-xl hover:bg-gray-500 transition-all shadow-md text-lg">
-                                                Cancel
-                                            </button>
+                                    {recipeImage && (
+                                        <div className="mt-2">
+                                            <img src={recipeImage} alt="Recipe Preview" className="w-20 h-20 object-cover rounded-xl shadow-md" />
                                         </div>
+                                    )}
+
+                                    <div className="flex space-x-4 mt-4">
+                                        <button
+                                            onClick={handleSaveRecipe} // Save changes for editing mode
+                                            className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg"
+                                        >
+                                            Save Changes
+                                        </button>
+
+                                        <button
+                                            onClick={() => {
+                                                setIsRecipeEditing(false); // Close the modal
+                                                setRecipeName('');
+                                                setRecipeDescription('');
+                                                setRecipeIngredients('');
+                                                setRecipeImage(null);
+                                            }}
+                                            className="bg-gray-400 text-white px-6 py-3 rounded-xl hover:bg-gray-500 transition-all shadow-md text-lg"
+                                        >
+                                            Cancel
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                        )}
+                        </div>
+                    )}
 
-                        {/* Show Recipes */}
-                        <div className="space-y-6 mt-8">
-                            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mt-8 mb-4">Posted Recipes</h2>
+                    {/* Show Recipes */}
+                    <div className="space-y-6 mt-8">
+                        <h2 className="text-2xl font-bold text-gray-800 dark:text-white mt-8 mb-4">Posted Recipes</h2>
 
-                            {/* Make the container flex-col so it stacks vertically */}
-                            <div className="flex flex-col space-y-6">
-                                {recipes.map((recipe, index) => (
-                                    <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
-                                        {recipe.image && (
-                                            <img src={recipe.image} alt={recipe.name} className="w-full h-60 object-cover rounded-md mb-3" />
-                                        )}
-                                        <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{recipe.name}</h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-300">{recipe.description}</p>
-                                        <ul className="list-disc list-inside mt-2 text-gray-700 dark:text-gray-300">
-                                            {Array.isArray(recipe.ingredients)
-                                                ? recipe.ingredients.map((ingredient, i) => <li key={i}>{ingredient}</li>)
-                                                : recipe.ingredients.split(',').map((ingredient, i) => <li key={i}>{ingredient.trim()}</li>)
-                                            }
-                                        </ul>
-                                        <button
-                                            onClick={() => handleEditRecipe(index)}
-                                            className="mt-3 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={() => handleRemoveRecipe(index)}
-                                            className="mt-3 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                                        >
-                                            Remove
-                                        </button>
-                                    </div>
-                                ))}
-                            </div>
+                        <div className="flex flex-col space-y-6">
+                            {recipes.map((recipe, index) => (
+                                <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-md">
+                                    {recipe.image && (
+                                        <img src={recipe.image} alt={recipe.name} className="w-full h-60 object-cover rounded-md mb-3" />
+                                    )}
+                                    <h3 className="text-xl font-semibold text-gray-800 dark:text-white">{recipe.name}</h3>
+                                    <p className="text-sm text-gray-600 dark:text-gray-300">{recipe.description}</p>
+                                    <ul className="list-disc list-inside mt-2 text-gray-700 dark:text-gray-300">
+                                        {Array.isArray(recipe.ingredients)
+                                            ? recipe.ingredients.map((ingredient, i) => <li key={i}>{ingredient}</li>)
+                                            : recipe.ingredients.split(',').map((ingredient, i) => <li key={i}>{ingredient.trim()}</li>)
+                                        }
+                                    </ul>
+                                    <button
+                                        onClick={() => handleEditRecipe(index)}
+                                        className="mt-3 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600"
+                                    >
+                                        Edit
+                                    </button>
+                                    <button
+                                        onClick={() => handleRemoveRecipe(index)}
+                                        className="mt-3 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -406,5 +429,6 @@ const Account = () => {
         </div>
     );
 };
+
 
 export default Account;
