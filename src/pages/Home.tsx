@@ -22,15 +22,17 @@ const HomePage = () => {
     return (
         <div>
             <Navbar />
+
             <h1 className="text-center text-3xl font-bold my-4">Recipe Wall</h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-4">
                 {recipes.length === 0 ? (
                     <p>No recipes found.</p>
                 ) : (
                     recipes.map((recipe) => (
-                        <div key={recipe.id} className="bg-white rounded-lg shadow-md p-4">
+                        <div key={recipe.id} className="p-4">
+
+                            <img src={recipe.image} alt={recipe.name} className="w-full h-48 object-cover mt-2" />
                             <h3 className="text-xl font-semibold">{recipe.name}</h3>
-                            <img src={recipe.image} alt={recipe.name} className="w-full h-48 object-cover rounded-md mt-2" />
                         </div>
                     ))
                 )}
