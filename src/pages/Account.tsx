@@ -24,6 +24,24 @@ const Account = () => {
     const [recipeImage, setRecipeImage] = useState(null);
     const [isRecipeEditing, setIsRecipeEditing] = useState(false);
 
+    const [isRecipeEditting, setIsRecipeEditingForm] = useState(false);
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
+    const [formData, setFormData] = useState({
+        name: '',
+        description: '',
+        ingredients: '',
+        image: '',
+    });
+
+    const handleEditRecipe = (index: number) => {
+        const recipeToEdit = recipes[index];
+        setEditingIndex(index);
+        setFormData(recipeToEdit); // pre-fill the form
+        setIsRecipeEditingForm(true);  // show modal
+    };
+
+
+
     const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email; // Or any unique identifier
 
     useEffect(() => {
@@ -271,6 +289,66 @@ const Account = () => {
                             </div>
                         )}
 
+                        {isRecipeEditting && (
+                            <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                                <div className="bg-white p-6 rounded-xl w-[90%] max-w-md shadow-lg">
+                                    <h2 className="text-xl font-semibold mb-4">Edit Recipe</h2>
+
+                                    <input
+                                        type="text"
+                                        placeholder="Recipe Name"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        className="w-full p-2 mb-2 border rounded"
+                                    />
+                                    <textarea
+                                        placeholder="Description"
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        className="w-full p-2 mb-2 border rounded"
+                                    />
+                                    <textarea
+                                        placeholder="Ingredients (comma-separated)"
+                                        value={formData.ingredients}
+                                        onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
+                                        className="w-full p-2 mb-2 border rounded"
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Image URL"
+                                        value={formData.image}
+                                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                                        className="w-full p-2 mb-4 border rounded"
+                                    />
+
+                                    <div className="flex justify-between">
+                                        <button
+                                            onClick={() => setIsRecipeEditingForm(false)}
+                                            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                if (editingIndex !== null) {
+                                                    const updatedRecipes = [...recipes];
+                                                    updatedRecipes[editingIndex] = formData;
+                                                    setRecipes(updatedRecipes);
+                                                    localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes));
+                                                    setIsRecipeEditingForm(false);
+                                                    setEditingIndex(null);
+                                                }
+                                            }}
+                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                        >
+                                            Save
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+
                         {/* Show Recipes */}
                         <div className="space-y-6 mt-8">
                             <h2 className="text-2xl font-bold text-gray-800 dark:text-white mt-8 mb-4">Posted Recipes</h2>
@@ -286,7 +364,10 @@ const Account = () => {
                                                 : recipe.ingredients.split(',').map((ingredient, i) => <li key={i}>{ingredient.trim()}</li>)
                                             }
                                         </ul>
-                                        <button onClick={() => handleRemoveRecipe(index)} className="mt-4 text-red-500">Remove</button>
+                                        <div className="flex gap-4 mt-4">
+                                            <button onClick={() => handleEditRecipe(index)} className="text-blue-500">Edit</button>
+                                            <button onClick={() => handleRemoveRecipe(index)} className="text-red-500">Remove</button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
