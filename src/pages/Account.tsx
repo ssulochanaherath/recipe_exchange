@@ -289,6 +289,7 @@ const Account = () => {
                             </div>
                         )}
 
+                        {/*Recipe editing form*/}
                         {isRecipeEditting && (
                             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                                 <div className="bg-white p-6 rounded-xl w-[90%] max-w-md shadow-lg">
@@ -313,13 +314,16 @@ const Account = () => {
                                         onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
                                         className="w-full p-2 mb-2 border rounded"
                                     />
-                                    <input
-                                        type="text"
-                                        placeholder="Image URL"
-                                        value={formData.image}
-                                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                                        className="w-full p-2 mb-4 border rounded"
-                                    />
+
+                                    {formData.image && (
+                                        <img
+                                            src={formData.image}
+                                            alt="Preview"
+                                            className="w-full max-h-64 object-contain mb-4 rounded border"
+                                            onError={(e) => (e.target.style.display = "none")} // hide image if URL is invalid
+                                        />
+                                    )}
+
 
                                     <div className="flex justify-between">
                                         <button
