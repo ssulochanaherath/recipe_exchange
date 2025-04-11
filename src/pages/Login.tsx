@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/slices/authSlice";
+import Swal from "sweetalert2";
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -29,7 +30,27 @@ const Login = () => {
         setPassword("");
         setError("");
 
-        alert("Login successful!");
+        Swal.fire({
+            title: "Welcome back! 🎉",
+            text: "You’ve successfully logged in.",
+            icon: "success",
+            timer: 2000,
+            showConfirmButton: false,
+            timerProgressBar: true,
+            background: "#f0f4ff",
+            color: "#1e293b",
+            iconColor: "#10b981", // Tailwind green-500
+            position: "center",
+            customClass: {
+                popup: 'rounded-3xl shadow-xl px-6 pt-8 pb-6',
+                title: 'text-2xl font-semibold',
+                htmlContainer: 'text-md',
+            },
+            didOpen: () => {
+                const popup = Swal.getPopup();
+                popup.classList.add('animate__animated', 'animate__fadeInDown');
+            },
+        });
         navigate("/home");
     };
 
