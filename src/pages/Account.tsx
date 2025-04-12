@@ -211,14 +211,34 @@ const Account = () => {
                     <div className="flex flex-col space-y-6">
                         {/* Center the image */}
 
-                        <div className="w-full flex justify-center">
+                        <div className="w-full flex justify-center relative">
                             <img
                                 src={image}
                                 alt="Avatar"
                                 className="w-64 h-78 rounded-2xl object-cover shadow-lg cursor-pointer hover:scale-105 transition-transform"
-                                onClick={() => setIsEditing(true)}
                             />
+                            <button
+                                onClick={() => setIsEditing(true)}
+                                className="absolute bottom-4 right-4 bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-3 rounded-full shadow-xl transform transition-all hover:scale-110 hover:shadow-2xl focus:outline-none"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    className="w-6 h-6"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M16 4h2a2 2 0 012 2v2m-6 8h2a2 2 0 012 2v2m-6 4h2a2 2 0 012 2v2m4-12V6a2 2 0 00-2-2H6a2 2 0 00-2 2v2a2 2 0 012 2h12a2 2 0 012-2z"
+                                    />
+                                </svg>
+                            </button>
                         </div>
+
+
 
                         {/* Left-align the rest */}
                         <div className="flex flex-col items-start text-left space-y-1">
