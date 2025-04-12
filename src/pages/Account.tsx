@@ -4,6 +4,7 @@ import { setAccountDetails } from "../redux/slices/accountSlice";
 import Navbar from "../component/Navbar";
 import { addRecipe, setPostedRecipes, editRecipe } from "../redux/slices/recipeSlice";
 import { RootState } from '../redux/store.ts';
+import imageCompression from 'browser-image-compression';
 
 const Account = () => {
     const dispatch = useDispatch();
@@ -34,7 +35,7 @@ const Account = () => {
         image: '',
     });
 
-    const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email; // Or any unique identifier
+    const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email;
 
     useEffect(() => {
         if (userId) {
@@ -63,23 +64,27 @@ const Account = () => {
         }
     }, [userId]);
 
-    const handleImageUpload = (event) => {
-        const uploadedFile = event.target.files[0];
-        if (uploadedFile) {
-            setFile(uploadedFile);
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setImage(reader.result);
-            };
-            reader.readAsDataURL(uploadedFile);
+    const handleImageUpload = async (file) => {
+        const options = {
+            maxSizeMB: 0.1,
+            maxWidthOrHeight: 600,
+            useWebWorker: true,
+        };
+
+        const compressedFile = await imageCompression(file, options);
+        const base64 = await imageCompression.getDataUrlFromFile(compressedFile);
+        setImage(base64);
+    };
+
+    const saveState = (data) => {
+        try {
+            const serializedData = JSON.stringify(data);
+            localStorage.setItem(`flavor-exchange-state-${userId}`, serializedData);
+        } catch (e) {
+            console.error("Failed to save data:", e);
         }
     };
 
-    const saveState = (updatedUser) => {
-        if (userId) {
-            localStorage.setItem(`flavor-exchange-state-${userId}`, JSON.stringify(updatedUser));
-        }
-    };
 
     const handleSaveDetails = () => {
         const updatedUser = {
@@ -103,8 +108,8 @@ const Account = () => {
             id: Date.now(),
             name: recipeName,
             description: recipeDescription,
-            ingredients: recipeIngredients.split(',').map(i => i.trim()), // Converts to array
-            image: recipeImage || "https://via.placeholder.com/150", // Default image if none provided
+            ingredients: recipeIngredients.split(',').map(i => i.trim()),
+            image: recipeImage || "https://via.placeholder.com/150",
         };
 
         const updatedRecipes = [...recipes, newRecipe];
@@ -187,7 +192,7 @@ const Account = () => {
 
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                const resizedBase64 = canvas.toDataURL('image/jpeg', 0.7); // 70% quality
+                const resizedBase64 = canvas.toDataURL('image/jpeg', 0.7);
                 callback(resizedBase64);
             };
             img.src = event.target.result;
@@ -205,6 +210,7 @@ const Account = () => {
                 <div className="hidden md:block w-1/4 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-2xl">
                     <div className="flex flex-col space-y-6">
                         {/* Center the image */}
+
                         <div className="w-full flex justify-center">
                             <img
                                 src={image}
@@ -233,20 +239,19 @@ const Account = () => {
                                 <div className="flex flex-col items-start space-y-6">
                                     <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Edit Your Profile</h2>
                                     <div className="flex items-center space-x-4">
+                                        <div className="mt-2">
+                                            <img src={image} alt="Profile Preview" className="w-20 h-20 object-cover rounded-xl shadow-md" />
+                                        </div>
                                         <input
                                             type="file"
-                                            onChange={handleImageUpload}
-                                            className="hidden"
-                                            id="image-upload"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                    handleImageUpload(file);
+                                                }
+                                            }}
                                         />
-                                        <label htmlFor="image-upload" className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all text-sm">
-                                            📷 Upload Image
-                                        </label>
-                                        {image && (
-                                            <div className="mt-2">
-                                                <img src={image} alt="Profile Preview" className="w-20 h-20 object-cover rounded-xl shadow-md" />
-                                            </div>
-                                        )}
                                     </div>
 
                                     <input
@@ -330,20 +335,6 @@ const Account = () => {
                                         <label htmlFor="recipe-image-upload" className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all text-sm">
                                             📷 Upload Recipe Image
                                         </label>
-
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => {
-                                                const file = e.target.files[0];
-                                                const reader = new FileReader();
-                                                reader.onloadend = () => {
-                                                    const base64Image = reader.result;
-                                                    setFormData((prev) => ({ ...prev, image: base64Image }));
-                                                };
-                                                if (file) reader.readAsDataURL(file);
-                                            }}
-                                        />
 
 
 
