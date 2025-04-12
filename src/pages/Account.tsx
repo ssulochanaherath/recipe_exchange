@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setAccountDetails } from "../redux/slices/accountSlice";
 import Navbar from "../component/Navbar";
-import { addRecipe, setPostedRecipes } from "../redux/slices/recipeSlice";
+import { addRecipe, setPostedRecipes, editRecipe } from "../redux/slices/recipeSlice";
 import { RootState } from '../redux/store.ts';
 
 const Account = () => {
@@ -27,20 +27,12 @@ const Account = () => {
     const [isRecipeEditting, setIsRecipeEditingForm] = useState(false);
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [formData, setFormData] = useState({
+        id: '',
         name: '',
         description: '',
         ingredients: '',
         image: '',
     });
-
-    const handleEditRecipe = (index: number) => {
-        const recipeToEdit = recipes[index];
-        setEditingIndex(index);
-        setFormData(recipeToEdit); // pre-fill the form
-        setIsRecipeEditingForm(true);  // show modal
-    };
-
-
 
     const userId = JSON.parse(localStorage.getItem('loggedInUser'))?.email; // Or any unique identifier
 
@@ -108,6 +100,7 @@ const Account = () => {
     // Handle recipe posting
     const handlePostRecipe = () => {
         const newRecipe = {
+            id: Date.now(),
             name: recipeName,
             description: recipeDescription,
             ingredients: recipeIngredients.split(',').map(i => i.trim()), // Converts to array
@@ -125,7 +118,6 @@ const Account = () => {
         setIsRecipeEditing(false);
         alert("Recipe posted successfully!");
 
-        // Optionally: Update the local recipes state to reflect changes immediately
         dispatch(setPostedRecipes(updatedRecipes));
     };
 
@@ -135,6 +127,75 @@ const Account = () => {
         dispatch(setPostedRecipes(updatedRecipes));
         localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes));
     };
+
+    const handleEditRecipe = (index: number) => {
+        const recipeToEdit = recipes[index];
+        setEditingIndex(index);
+        setFormData({ ...recipeToEdit });
+        setIsRecipeEditingForm(true);
+    };
+
+    const handleSaveEditedRecipe = () => {
+        if (editingIndex === null) return;
+
+        // Replace the recipe at editingIndex with updated formData
+        const updatedRecipes = recipes.map((recipe, index) =>
+            index === editingIndex ? { ...formData } : recipe
+        );
+
+        dispatch(setPostedRecipes(updatedRecipes));
+        localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes));
+
+        setEditingIndex(null);
+        setFormData({
+            id: '',
+            name: '',
+            description: '',
+            ingredients: '',
+            image: '',
+        });
+        setIsRecipeEditingForm(false);
+    };
+
+
+
+    const cancelEditRecipe = () => {
+        setIsRecipeEditingForm(false);
+    };
+
+
+
+    const handleRecipeImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            resizeImage(file, 400, 400, (base64Image) => {
+                setFormData((prev) => ({ ...prev, image: base64Image }));
+            });
+        }
+    };
+
+
+    const resizeImage = (file, maxWidth, maxHeight, callback) => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const scale = Math.min(maxWidth / img.width, maxHeight / img.height);
+                canvas.width = img.width * scale;
+                canvas.height = img.height * scale;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const resizedBase64 = canvas.toDataURL('image/jpeg', 0.7); // 70% quality
+                callback(resizedBase64);
+            };
+            img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+
+
 
 
     return (
@@ -270,11 +331,21 @@ const Account = () => {
                                             📷 Upload Recipe Image
                                         </label>
 
-                                        {recipeImage && (
-                                            <div className="mt-2">
-                                                <img src={recipeImage} alt="Recipe Preview" className="w-20 h-20 object-cover rounded-xl shadow-md" />
-                                            </div>
-                                        )}
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file = e.target.files[0];
+                                                const reader = new FileReader();
+                                                reader.onloadend = () => {
+                                                    const base64Image = reader.result;
+                                                    setFormData((prev) => ({ ...prev, image: base64Image }));
+                                                };
+                                                if (file) reader.readAsDataURL(file);
+                                            }}
+                                        />
+
+
 
                                         <div className="flex space-x-4 mt-4">
                                             <button onClick={handlePostRecipe} className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition-all shadow-md text-lg">
@@ -289,7 +360,7 @@ const Account = () => {
                             </div>
                         )}
 
-                        {/*Recipe editing form*/}
+                        {/* Recipe editing form */}
                         {isRecipeEditting && (
                             <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
                                 <div className="bg-white p-6 rounded-xl w-[90%] max-w-md shadow-lg">
@@ -315,37 +386,31 @@ const Account = () => {
                                         className="w-full p-2 mb-2 border rounded"
                                     />
 
+                                    <input
+                                        type="file"
+                                        onChange={handleRecipeImageUpload}
+                                        className="hidden"
+                                        id="recipe-image-upload"
+                                    />
+                                    <label htmlFor="recipe-image-upload" className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-all text-sm">
+                                        📷 Change Image
+                                    </label>
                                     {formData.image && (
-                                        <img
-                                            src={formData.image}
-                                            alt="Preview"
-                                            className="w-full max-h-64 object-contain mb-4 rounded border"
-                                            onError={(e) => (e.target.style.display = "none")} // hide image if URL is invalid
-                                        />
+                                        <img src={formData.image} alt="Recipe Preview" className="w-20 h-20 object-cover rounded-xl shadow-md mt-2" />
                                     )}
 
-
-                                    <div className="flex justify-between">
+                                    <div className="flex justify-between mt-4">
                                         <button
-                                            onClick={() => setIsRecipeEditingForm(false)}
+                                            onClick={cancelEditRecipe}
                                             className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
                                         >
                                             Cancel
                                         </button>
                                         <button
-                                            onClick={() => {
-                                                if (editingIndex !== null) {
-                                                    const updatedRecipes = [...recipes];
-                                                    updatedRecipes[editingIndex] = formData;
-                                                    setRecipes(updatedRecipes);
-                                                    localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes));
-                                                    setIsRecipeEditingForm(false);
-                                                    setEditingIndex(null);
-                                                }
-                                            }}
-                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                            onClick={handleSaveEditedRecipe}
+                                            className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
                                         >
-                                            Save
+                                            Save Changes
                                         </button>
                                     </div>
                                 </div>

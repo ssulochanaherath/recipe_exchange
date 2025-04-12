@@ -18,8 +18,14 @@ const recipeSlice = createSlice({
         loadRecipes: (state, action) => {
             return action.payload;
         },
+        editRecipe: (state, action) => {
+            const index = state.findIndex((recipe) => recipe.id === action.payload.id);
+            if (index !== -1) {
+                state[index] = { ...state[index], ...action.payload };  // Update the recipe
+            }
+        },
     }
 });
 
-export const { setPostedRecipes, addRecipe, removeRecipe, loadRecipes } = recipeSlice.actions;
+export const { setPostedRecipes, addRecipe, removeRecipe, loadRecipes, editRecipe } = recipeSlice.actions;
 export default recipeSlice.reducer;

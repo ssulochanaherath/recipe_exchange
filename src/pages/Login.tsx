@@ -36,10 +36,10 @@ const Login = () => {
             icon: "success",
             timer: 2000,
             showConfirmButton: false,
-            timerProgressBar: true,
+            timerProgressBar: false,
             background: "#f0f4ff",
             color: "#1e293b",
-            iconColor: "#10b981", // Tailwind green-500
+            iconColor: "#10b981",
             position: "center",
             customClass: {
                 popup: 'rounded-3xl shadow-xl px-6 pt-8 pb-6',
