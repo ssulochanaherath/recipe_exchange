@@ -102,14 +102,14 @@ const Account = () => {
         alert("Profile updated successfully!");
     };
 
-    // Handle recipe posting
     const handlePostRecipe = () => {
         const newRecipe = {
-            id: Date.now(),
+            id: Date.now() + Math.random(),
             name: recipeName,
             description: recipeDescription,
             ingredients: recipeIngredients.split(',').map(i => i.trim()),
             image: recipeImage || "https://via.placeholder.com/150",
+            userId,
         };
 
         const updatedRecipes = [...recipes, newRecipe];
@@ -125,6 +125,7 @@ const Account = () => {
 
         dispatch(setPostedRecipes(updatedRecipes));
     };
+
 
     const handleRemoveRecipe = (index) => {
         const updatedRecipes = recipes.filter((_, i) => i !== index);
