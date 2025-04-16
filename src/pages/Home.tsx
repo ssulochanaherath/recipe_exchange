@@ -32,8 +32,8 @@ const HomePage = () => {
         }
         dispatch(loadRecipes(allRecipes));
 
-        // Load favorites from localStorage only once
-        dispatch(loadFavorites());
+        const savedFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+        dispatch(loadFavorites(savedFavorites));
     }, [dispatch]);
 
     const openRecipePopup = (recipe: any) => {
@@ -48,14 +48,20 @@ const HomePage = () => {
 
     const handleFavoriteToggle = (recipe: any) => {
         const isAlreadyFavorite = favorites.some((fav: any) => fav.id === recipe.id);
+
         if (isAlreadyFavorite) {
             dispatch(removeFavorite(recipe));
         } else {
             dispatch(addFavorite(recipe));
         }
+
+        const updatedFavorites = isAlreadyFavorite
+            ? favorites.filter((fav: any) => fav.id !== recipe.id)
+            : [...favorites, recipe];
+
+        localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
     };
 
-    // Filter recipes based on the search query
     const filteredRecipes = recipes.filter((recipe: any) =>
         recipe.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
