@@ -7,10 +7,9 @@ const favoritesSlice = createSlice({
     },
     reducers: {
         addFavorite: (state, action) => {
-            const { id, name, description, ingredients } = action.payload;
-            const exists = state.favorites.some(fav => fav.id === id);
+            const exists = state.favorites.some(fav => fav.id === action.payload.id);
             if (!exists) {
-                state.favorites.push({ id, name, description, ingredients });
+                state.favorites.push(action.payload);
                 localStorage.setItem('favorites', JSON.stringify(state.favorites));
             }
         },
