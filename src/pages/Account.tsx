@@ -5,6 +5,7 @@ import Navbar from "../component/Navbar";
 import { addRecipe, setPostedRecipes, editRecipe } from "../redux/slices/recipeSlice";
 import { RootState } from '../redux/store.ts';
 import imageCompression from 'browser-image-compression';
+import Swal from 'sweetalert2';
 
 const Account = () => {
     const dispatch = useDispatch();
@@ -121,7 +122,12 @@ const Account = () => {
         setRecipeIngredients("");
         setRecipeImage(null);
         setIsRecipeEditing(false);
-        alert("Recipe posted successfully!");
+        Swal.fire({
+            title: 'Posted Successfully',
+            text: 'Recipe posted successfully!',
+            icon: 'success',
+            confirmButtonText: 'Okay',
+        });
 
         dispatch(setPostedRecipes(updatedRecipes));
     };

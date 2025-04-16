@@ -21,7 +21,7 @@ const HomePage = () => {
             const key = localStorage.key(i);
             if (key && key.startsWith("recipes-")) {
                 try {
-                    const storedRecipes = JSON.parse(localStorage.getItem(key));
+                    const storedRecipes = JSON.parse(localStorage.getItem(key) || '[]');
                     if (Array.isArray(storedRecipes)) {
                         allRecipes.push(...storedRecipes);
                     }
@@ -30,11 +30,13 @@ const HomePage = () => {
                 }
             }
         }
+
         dispatch(loadRecipes(allRecipes));
 
         const savedFavorites = JSON.parse(localStorage.getItem('favorites') || '[]');
         dispatch(loadFavorites(savedFavorites));
     }, [dispatch]);
+
 
     const openRecipePopup = (recipe: any) => {
         setSelectedRecipe(recipe);
@@ -60,7 +62,10 @@ const HomePage = () => {
             : [...favorites, recipe];
 
         localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+
+        dispatch(loadFavorites(updatedFavorites));
     };
+
 
     const filteredRecipes = recipes.filter((recipe: any) =>
         recipe.name.toLowerCase().includes(searchQuery.toLowerCase())
