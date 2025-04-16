@@ -100,7 +100,12 @@ const Account = () => {
         saveState(updatedUser);
 
         setIsEditing(false);
-        alert("Profile updated successfully!");
+        Swal.fire({
+            title: 'Saved',
+            text: 'Account details saved successfully!',
+            icon: 'success',
+            confirmButtonText: 'Okay',
+        });
     };
 
     const handlePostRecipe = () => {
@@ -123,7 +128,7 @@ const Account = () => {
         setRecipeImage(null);
         setIsRecipeEditing(false);
         Swal.fire({
-            title: 'Posted Successfully',
+            title: 'Successfull',
             text: 'Recipe posted successfully!',
             icon: 'success',
             confirmButtonText: 'Okay',
@@ -150,7 +155,6 @@ const Account = () => {
     const handleSaveEditedRecipe = () => {
         if (editingIndex === null) return;
 
-        // Replace the recipe at editingIndex with updated formData
         const updatedRecipes = recipes.map((recipe, index) =>
             index === editingIndex ? { ...formData } : recipe
         );
