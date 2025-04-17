@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addFavorite, removeFavorite } from '../redux/slices/favoritesSlice';
+import Swal from "sweetalert2";
 
 const RecipeForm = ({ recipe }: { recipe: any }) => {
     const dispatch = useDispatch();
@@ -11,8 +12,20 @@ const RecipeForm = ({ recipe }: { recipe: any }) => {
         e.stopPropagation();
         if (!isFavorite) {
             dispatch(addFavorite(recipe));
+            Swal.fire({
+                title: 'Saved',
+                text: 'Recipe added to Favorites!',
+                icon: 'success',
+                confirmButtonText: 'Okay',
+            });
         } else {
             dispatch(removeFavorite(recipe));
+            Swal.fire({
+                title: 'Removed',
+                text: 'Remove from Favorites!',
+                icon: 'success',
+                confirmButtonText: 'Okay',
+            });
         }
     };
 
