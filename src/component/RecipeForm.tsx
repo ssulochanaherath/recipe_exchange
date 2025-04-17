@@ -13,18 +13,18 @@ const RecipeForm = ({ recipe }: { recipe: any }) => {
         if (!isFavorite) {
             dispatch(addFavorite(recipe));
             Swal.fire({
-                title: 'Saved',
-                text: 'Recipe added to Favorites!',
+                title: '✨ Added to Favorites',
+                text: 'This recipe is now in your favorites!',
                 icon: 'success',
-                confirmButtonText: 'Okay',
+                confirmButtonText: 'Nice!',
             });
         } else {
             dispatch(removeFavorite(recipe));
             Swal.fire({
-                title: 'Removed',
-                text: 'Remove from Favorites!',
-                icon: 'success',
-                confirmButtonText: 'Okay',
+                title: '❌ Removed from Favorites',
+                text: 'This recipe was removed from your favorites.',
+                icon: 'info',
+                confirmButtonText: 'Got it',
             });
         }
     };

@@ -128,10 +128,10 @@ const Account = () => {
         setRecipeImage(null);
         setIsRecipeEditing(false);
         Swal.fire({
-            title: 'Successfull',
-            text: 'Recipe posted successfully!',
+            title: '✅ Recipe Posted',
+            text: 'Your recipe has been shared successfully!',
             icon: 'success',
-            confirmButtonText: 'Okay',
+            confirmButtonText: 'Awesome!',
         });
 
         dispatch(setPostedRecipes(updatedRecipes));
@@ -143,6 +143,12 @@ const Account = () => {
 
         dispatch(setPostedRecipes(updatedRecipes));
         localStorage.setItem(`recipes-${userId}`, JSON.stringify(updatedRecipes));
+        Swal.fire({
+            title: '🗑️ Recipe Removed',
+            text: 'The recipe has been deleted from your posts.',
+            icon: 'info',
+            confirmButtonText: 'Understood',
+        });
     };
 
     const handleEditRecipe = (index: number) => {
@@ -171,6 +177,12 @@ const Account = () => {
             image: '',
         });
         setIsRecipeEditingForm(false);
+        Swal.fire({
+            title: '✏️ Recipe Updated',
+            text: 'Your changes have been saved successfully.',
+            icon: 'success',
+            confirmButtonText: 'Great!',
+        });
     };
 
 
